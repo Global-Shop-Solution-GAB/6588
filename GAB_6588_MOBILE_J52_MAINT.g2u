@@ -1,0 +1,1647 @@
+﻿Program.Sub.ScreenSU.Start
+Gui.FMobileJ52Maint..Create(BaseForm)
+Gui.FMobileJ52Maint..Caption("Mobile WIP to FG Settings")
+Gui.FMobileJ52Maint..Size(9315,6585)
+Gui.FMobileJ52Maint..MinX(0)
+Gui.FMobileJ52Maint..MinY(0)
+Gui.FMobileJ52Maint..Position(0,0)
+Gui.FMobileJ52Maint..BackColor(-2147483633)
+Gui.FMobileJ52Maint..MousePointer(0)
+Gui.FMobileJ52Maint..Event(UnLoad,FMobileJ52Maint_UnLoad)
+Gui.FMobileJ52Maint..MaxButton(False)
+Gui.FMobileJ52Maint..Moveable(False)
+Gui.FMobileJ52Maint..Sizeable(False)
+Gui.FMobileJ52Maint..AlwaysOnTop(False)
+Gui.FMobileJ52Maint..FontName("Tahoma")
+Gui.FMobileJ52Maint..FontSize(8.25)
+Gui.FMobileJ52Maint..ControlBox(True)
+Gui.FMobileJ52Maint..MinButton(True)
+Gui.FMobileJ52Maint..ShowInTaskBar(True)
+Gui.FMobileJ52Maint..TitleBar(True)
+Gui.FMobileJ52Maint.frameParent.Create(Frame)
+Gui.FMobileJ52Maint.frameParent.Size(8940,5475)
+Gui.FMobileJ52Maint.frameParent.Position(195,495)
+Gui.FMobileJ52Maint.frameParent.Enabled(False)
+Gui.FMobileJ52Maint.frameParent.Visible(True)
+Gui.FMobileJ52Maint.frameParent.Zorder(0)
+Gui.FMobileJ52Maint.frameParent.Caption("")
+Gui.FMobileJ52Maint.frameParent.FontName("Tahoma")
+Gui.FMobileJ52Maint.frameParent.FontSize(8.25)
+Gui.FMobileJ52Maint.frameJ52.Create(Frame)
+Gui.FMobileJ52Maint.frameJ52.Size(8520,4875)
+Gui.FMobileJ52Maint.frameJ52.Position(195,390)
+Gui.FMobileJ52Maint.frameJ52.Caption("J52 - WIP to FG Transaction Options")
+Gui.FMobileJ52Maint.frameJ52.Enabled(False)
+Gui.FMobileJ52Maint.frameJ52.Parent("frameParent")
+Gui.FMobileJ52Maint.frameJ52.Visible(True)
+Gui.FMobileJ52Maint.frameJ52.Zorder(0)
+Gui.FMobileJ52Maint.frameJ52.FontName("Tahoma")
+Gui.FMobileJ52Maint.frameJ52.FontSize(8.25)
+Gui.FMobileJ52Maint.chkDefaultBin.Create(CheckBox)
+Gui.FMobileJ52Maint.chkDefaultBin.Size(1515,300)
+Gui.FMobileJ52Maint.chkDefaultBin.Position(2505,255)
+Gui.FMobileJ52Maint.chkDefaultBin.Parent("frameJ52")
+Gui.FMobileJ52Maint.chkDefaultBin.Caption("Default Bin")
+Gui.FMobileJ52Maint.chkDefaultBin.Event(Click,chkDefaultBin_Click)
+Gui.FMobileJ52Maint.chkDefaultBin.Enabled(True)
+Gui.FMobileJ52Maint.chkDefaultBin.Visible(True)
+Gui.FMobileJ52Maint.chkDefaultBin.Zorder(0)
+Gui.FMobileJ52Maint.chkDefaultBin.FontName("Tahoma")
+Gui.FMobileJ52Maint.chkDefaultBin.FontSize(8.25)
+Gui.FMobileJ52Maint.lblJ52W.Create(Label,"!",False,30,210,0,2310,645,True,2,"Arial",8,-2147483633,0,0)
+Gui.FMobileJ52Maint.lblJ52W.Parent("frameJ52")
+Gui.FMobileJ52Maint.lblJ52W.ForeColor(255)
+Gui.FMobileJ52Maint.lblJ52W.BorderStyle(0)
+Gui.FMobileJ52Maint.txtToBinJ52.Create(TextBox,"",True,1530,300,0,300,570,True,0,"Arial",8,-2147483643,1)
+Gui.FMobileJ52Maint.txtToBinJ52.Parent("frameJ52")
+Gui.FMobileJ52Maint.txtToBinJ52.Locked(True)
+Gui.FMobileJ52Maint.txtToBinJ52.Event(Change,ChangesMade)
+Gui.FMobileJ52Maint.chkStockingBin.Create(CheckBox)
+Gui.FMobileJ52Maint.chkStockingBin.Size(1515,300)
+Gui.FMobileJ52Maint.chkStockingBin.Position(2505,585)
+Gui.FMobileJ52Maint.chkStockingBin.Parent("frameJ52")
+Gui.FMobileJ52Maint.chkStockingBin.Caption("Stocking Bin")
+Gui.FMobileJ52Maint.chkStockingBin.Event(Click,chkStockingBin_Click)
+Gui.FMobileJ52Maint.chkStockingBin.Enabled(True)
+Gui.FMobileJ52Maint.chkStockingBin.Visible(True)
+Gui.FMobileJ52Maint.chkStockingBin.Zorder(0)
+Gui.FMobileJ52Maint.chkStockingBin.FontName("Tahoma")
+Gui.FMobileJ52Maint.chkStockingBin.FontSize(8.25)
+Gui.FMobileJ52Maint.lblJ52P.Create(Label,"!",False,210,300,0,7710,630,True,2,"Arial",8,-2147483633,0,0)
+Gui.FMobileJ52Maint.lblJ52P.Parent("frameJ52")
+Gui.FMobileJ52Maint.lblJ52P.ForeColor(255)
+Gui.FMobileJ52Maint.lblJ52P.BorderStyle(0)
+Gui.FMobileJ52Maint.lblCloseJ52.Create(Label,"Close",True,405,210,0,60,1095,True,0,"Arial",8,-2147483633,0,0)
+Gui.FMobileJ52Maint.lblCloseJ52.Parent("frameJ52")
+Gui.FMobileJ52Maint.lblCloseJ52.BorderStyle(0)
+Gui.FMobileJ52Maint.ddlCloseJ52.Create(DropDownList)
+Gui.FMobileJ52Maint.ddlCloseJ52.Size(3510,300)
+Gui.FMobileJ52Maint.ddlCloseJ52.Position(630,990)
+Gui.FMobileJ52Maint.ddlCloseJ52.Parent("frameJ52")
+Gui.FMobileJ52Maint.ddlCloseJ52.Event(Click,ChangesMade)
+Gui.FMobileJ52Maint.ddlCloseJ52.Enabled(True)
+Gui.FMobileJ52Maint.ddlCloseJ52.Visible(True)
+Gui.FMobileJ52Maint.ddlCloseJ52.Zorder(0)
+Gui.FMobileJ52Maint.ddlCloseJ52.FontName("Tahoma")
+Gui.FMobileJ52Maint.ddlCloseJ52.FontSize(8.25)
+Gui.FMobileJ52Maint.ddlCloseJ52.Event(Change,ChangesMade)
+Gui.FMobileJ52Maint.chkPrintJ52.Create(CheckBox)
+Gui.FMobileJ52Maint.chkPrintJ52.Size(3135,300)
+Gui.FMobileJ52Maint.chkPrintJ52.Position(4260,270)
+Gui.FMobileJ52Maint.chkPrintJ52.Parent("frameJ52")
+Gui.FMobileJ52Maint.chkPrintJ52.Caption("Print WIP to FG Labels?")
+Gui.FMobileJ52Maint.chkPrintJ52.Event(Click,CheckPrinterClicked)
+Gui.FMobileJ52Maint.chkPrintJ52.Enabled(True)
+Gui.FMobileJ52Maint.chkPrintJ52.Visible(True)
+Gui.FMobileJ52Maint.chkPrintJ52.Zorder(0)
+Gui.FMobileJ52Maint.chkPrintJ52.FontName("Tahoma")
+Gui.FMobileJ52Maint.chkPrintJ52.FontSize(8.25)
+Gui.FMobileJ52Maint.cmdPrinterBrowserJ52.Create(Button)
+Gui.FMobileJ52Maint.cmdPrinterBrowserJ52.Size(375,330)
+Gui.FMobileJ52Maint.cmdPrinterBrowserJ52.Position(7020,600)
+Gui.FMobileJ52Maint.cmdPrinterBrowserJ52.Parent("frameJ52")
+Gui.FMobileJ52Maint.cmdPrinterBrowserJ52.Caption("^")
+Gui.FMobileJ52Maint.cmdPrinterBrowserJ52.Event(Click,cmdPrinterBrowserJ52_Click)
+Gui.FMobileJ52Maint.cmdPrinterBrowserJ52.Enabled(False)
+Gui.FMobileJ52Maint.cmdPrinterBrowserJ52.Visible(True)
+Gui.FMobileJ52Maint.cmdPrinterBrowserJ52.Zorder(0)
+Gui.FMobileJ52Maint.cmdPrinterBrowserJ52.FontName("Tahoma")
+Gui.FMobileJ52Maint.cmdPrinterBrowserJ52.FontSize(8.25)
+Gui.FMobileJ52Maint.txtPrinterJ52.Create(TextBox,"",True,1590,300,0,5370,615,False,0,"Arial",8,-2147483643,1)
+Gui.FMobileJ52Maint.txtPrinterJ52.Parent("frameJ52")
+Gui.FMobileJ52Maint.txtPrinterJ52.Event(Change,ChangesMade)
+Gui.FMobileJ52Maint.lblPrinterJ52.Create(Label,"Select Printer",True,975,210,0,4260,660,True,0,"Arial",8,-2147483633,0,0)
+Gui.FMobileJ52Maint.lblPrinterJ52.Parent("frameJ52")
+Gui.FMobileJ52Maint.lblPrinterJ52.BorderStyle(0)
+Gui.FMobileJ52Maint.cmdBinBrowserJ52.Create(Button)
+Gui.FMobileJ52Maint.cmdBinBrowserJ52.Size(375,315)
+Gui.FMobileJ52Maint.cmdBinBrowserJ52.Position(1920,570)
+Gui.FMobileJ52Maint.cmdBinBrowserJ52.Parent("frameJ52")
+Gui.FMobileJ52Maint.cmdBinBrowserJ52.Caption("^")
+Gui.FMobileJ52Maint.cmdBinBrowserJ52.Event(Click,cmdBinBrowserJ52_Click)
+Gui.FMobileJ52Maint.cmdBinBrowserJ52.Enabled(True)
+Gui.FMobileJ52Maint.cmdBinBrowserJ52.Visible(True)
+Gui.FMobileJ52Maint.cmdBinBrowserJ52.Zorder(0)
+Gui.FMobileJ52Maint.cmdBinBrowserJ52.FontName("Tahoma")
+Gui.FMobileJ52Maint.cmdBinBrowserJ52.FontSize(8.25)
+Gui.FMobileJ52Maint.lblToBin.Create(Label,"Default WIP to FG Bin",True,2370,255,0,165,330,True,0,"Arial",8,-2147483633,0,0)
+Gui.FMobileJ52Maint.lblToBin.Parent("frameJ52")
+Gui.FMobileJ52Maint.lblToBin.BorderStyle(0)
+Gui.FMobileJ52Maint.cmdSave.Create(Button)
+Gui.FMobileJ52Maint.cmdSave.Size(1410,375)
+Gui.FMobileJ52Maint.cmdSave.Position(6915,60)
+Gui.FMobileJ52Maint.cmdSave.Caption("Save")
+Gui.FMobileJ52Maint.cmdSave.FontStyle(True,False,False,False,False)
+Gui.FMobileJ52Maint.cmdSave.ControlGroup(1)
+Gui.FMobileJ52Maint.cmdSave.Event(Click,cmdSave_Click)
+Gui.FMobileJ52Maint.cmdSave.Enabled(False)
+Gui.FMobileJ52Maint.cmdSave.Visible(True)
+Gui.FMobileJ52Maint.cmdSave.Zorder(0)
+Gui.FMobileJ52Maint.cmdSave.FontName("Tahoma")
+Gui.FMobileJ52Maint.cmdSave.FontSize(8.25)
+Gui.FMobileJ52Maint.cmdRefresh.Create(Button)
+Gui.FMobileJ52Maint.cmdRefresh.Size(735,375)
+Gui.FMobileJ52Maint.cmdRefresh.Position(8415,60)
+Gui.FMobileJ52Maint.cmdRefresh.Caption("REFRESH")
+Gui.FMobileJ52Maint.cmdRefresh.FontStyle(True,False,False,False,False)
+Gui.FMobileJ52Maint.cmdRefresh.Event(Click,cmdRefresh_Click)
+Gui.FMobileJ52Maint.cmdRefresh.ControlGroup(1)
+Gui.FMobileJ52Maint.cmdRefresh.Enabled(False)
+Gui.FMobileJ52Maint.cmdRefresh.Visible(True)
+Gui.FMobileJ52Maint.cmdRefresh.Zorder(0)
+Gui.FMobileJ52Maint.cmdRefresh.FontName("Tahoma")
+Gui.FMobileJ52Maint.cmdRefresh.FontSize(8.25)
+Gui.FMobileJ52Maint.chkj52.Create(CheckBox)
+Gui.FMobileJ52Maint.chkj52.Enabled(True)
+Gui.FMobileJ52Maint.chkj52.Visible(True)
+Gui.FMobileJ52Maint.chkj52.Zorder(0)
+Gui.FMobileJ52Maint.chkj52.Size(1785,300)
+Gui.FMobileJ52Maint.chkj52.Position(435,555)
+Gui.FMobileJ52Maint.chkj52.Caption("J52 Enabled")
+Gui.FMobileJ52Maint.chkj52.FontName("Tahoma")
+Gui.FMobileJ52Maint.chkj52.FontSize(8.25)
+Gui.FMobileJ52Maint.chkj52.Event(Click,ToggleTransactionEnabled)
+Gui.FMobileJ52Maint.txtcopiesJ52.Create(TextBox,"",True,330,300,0,8475,1485,True,0,"Tahoma",8.25,,1)
+Gui.FMobileJ52Maint.txtcopiesJ52.Event(Change,ChangesMade)
+Gui.FMobileJ52Maint.txtcopiesJ52.NumericOnly(2)
+Gui.FMobileJ52Maint.txtcopiesJ52.DefaultValue("")
+Gui.FMobileJ52Maint.txtcopiesJ52.MaxLength(1)
+Gui.FMobileJ52Maint.lbl1.Create(Label,"Copies",True,480,195,0,7905,1530,True,0,"Tahoma",8.25,,0,0)
+Gui.FMobileJ52Maint.lbl1.BorderStyle(0)
+Gui.FMobileJ52Maint.lblMobileFormMapping.Create(Label,"Mobile Form Mapping",True,1530,225,0,540,2745,True,0,"Tahoma",8.25,,0,0)
+Gui.FMobileJ52Maint.lblMobileFormMapping.BorderStyle(1)
+Gui.FMobileJ52Maint.lblWO.Create(Label,"WO",True,270,195,0,660,3225,True,0,"Tahoma",8.25,,0,0)
+Gui.FMobileJ52Maint.lblWO.BorderStyle(0)
+Gui.FMobileJ52Maint.ddlWOfld.Create(DropDownList)
+Gui.FMobileJ52Maint.ddlWOfld.Enabled(True)
+Gui.FMobileJ52Maint.ddlWOfld.Visible(True)
+Gui.FMobileJ52Maint.ddlWOfld.Zorder(0)
+Gui.FMobileJ52Maint.ddlWOfld.Size(1500,300)
+Gui.FMobileJ52Maint.ddlWOfld.Position(1650,3180)
+Gui.FMobileJ52Maint.ddlWOfld.FontName("Tahoma")
+Gui.FMobileJ52Maint.ddlWOfld.FontSize(8.25)
+Gui.FMobileJ52Maint.ddlWOfld.Event(Click,ChangesMade)
+Gui.FMobileJ52Maint.lblQty.Create(Label,"Quantity",True,630,195,0,645,3615,True,0,"Tahoma",8.25,,0,0)
+Gui.FMobileJ52Maint.lblQty.BorderStyle(0)
+Gui.FMobileJ52Maint.ddlQtyfld.Create(DropDownList)
+Gui.FMobileJ52Maint.ddlQtyfld.Enabled(True)
+Gui.FMobileJ52Maint.ddlQtyfld.Visible(True)
+Gui.FMobileJ52Maint.ddlQtyfld.Zorder(0)
+Gui.FMobileJ52Maint.ddlQtyfld.Size(1500,300)
+Gui.FMobileJ52Maint.ddlQtyfld.Position(1650,3555)
+Gui.FMobileJ52Maint.ddlQtyfld.FontName("Tahoma")
+Gui.FMobileJ52Maint.ddlQtyfld.FontSize(8.25)
+Gui.FMobileJ52Maint.ddlQtyfld.Event(Click,ChangesMade)
+Gui.FMobileJ52Maint.lblLot.Create(Label,"Lot",True,225,195,0,645,3945,True,0,"Tahoma",8.25,,0,0)
+Gui.FMobileJ52Maint.lblLot.BorderStyle(0)
+Gui.FMobileJ52Maint.ddlLotfld.Create(DropDownList)
+Gui.FMobileJ52Maint.ddlLotfld.Enabled(True)
+Gui.FMobileJ52Maint.ddlLotfld.Visible(True)
+Gui.FMobileJ52Maint.ddlLotfld.Zorder(0)
+Gui.FMobileJ52Maint.ddlLotfld.Size(1500,300)
+Gui.FMobileJ52Maint.ddlLotfld.Position(1650,3945)
+Gui.FMobileJ52Maint.ddlLotfld.FontName("Tahoma")
+Gui.FMobileJ52Maint.ddlLotfld.FontSize(8.25)
+Gui.FMobileJ52Maint.ddlLotfld.Event(Click,ChangesMade)
+Gui.FMobileJ52Maint.lblBin.Create(Label,"Bin",True,210,195,0,630,4305,True,0,"Tahoma",8.25,,0,0)
+Gui.FMobileJ52Maint.lblBin.BorderStyle(0)
+Gui.FMobileJ52Maint.ddlBinfld.Create(DropDownList)
+Gui.FMobileJ52Maint.ddlBinfld.Enabled(True)
+Gui.FMobileJ52Maint.ddlBinfld.Visible(True)
+Gui.FMobileJ52Maint.ddlBinfld.Zorder(0)
+Gui.FMobileJ52Maint.ddlBinfld.Size(1500,300)
+Gui.FMobileJ52Maint.ddlBinfld.Position(1650,4335)
+Gui.FMobileJ52Maint.ddlBinfld.FontName("Tahoma")
+Gui.FMobileJ52Maint.ddlBinfld.FontSize(8.25)
+Gui.FMobileJ52Maint.ddlBinfld.Event(Click,ChangesMade)
+Gui.FMobileJ52Maint.lblHeat.Create(Label,"Heat",True,345,195,0,630,4680,True,0,"Tahoma",8.25,,0,0)
+Gui.FMobileJ52Maint.lblHeat.BorderStyle(0)
+Gui.FMobileJ52Maint.ddlHeatfld.Create(DropDownList)
+Gui.FMobileJ52Maint.ddlHeatfld.Enabled(True)
+Gui.FMobileJ52Maint.ddlHeatfld.Visible(True)
+Gui.FMobileJ52Maint.ddlHeatfld.Zorder(0)
+Gui.FMobileJ52Maint.ddlHeatfld.Size(1500,300)
+Gui.FMobileJ52Maint.ddlHeatfld.Position(1650,4710)
+Gui.FMobileJ52Maint.ddlHeatfld.FontName("Tahoma")
+Gui.FMobileJ52Maint.ddlHeatfld.FontSize(8.25)
+Gui.FMobileJ52Maint.ddlHeatfld.Event(Click,ChangesMade)
+Gui.FMobileJ52Maint.lblSerial.Create(Label,"Serial",True,390,195,0,615,5085,True,0,"Tahoma",8.25,,0,0)
+Gui.FMobileJ52Maint.lblSerial.BorderStyle(0)
+Gui.FMobileJ52Maint.ddlSerialfld.Create(DropDownList)
+Gui.FMobileJ52Maint.ddlSerialfld.Enabled(True)
+Gui.FMobileJ52Maint.ddlSerialfld.Visible(True)
+Gui.FMobileJ52Maint.ddlSerialfld.Zorder(0)
+Gui.FMobileJ52Maint.ddlSerialfld.Size(1500,300)
+Gui.FMobileJ52Maint.ddlSerialfld.Position(1650,5100)
+Gui.FMobileJ52Maint.ddlSerialfld.FontName("Tahoma")
+Gui.FMobileJ52Maint.ddlSerialfld.FontSize(8.25)
+Gui.FMobileJ52Maint.ddlSerialfld.Event(Click,ChangesMade)
+Gui.FMobileJ52Maint.lblUser1.Create(Label,"User_1",True,510,195,0,3990,3210,True,0,"Tahoma",8.25,,0,0)
+Gui.FMobileJ52Maint.lblUser1.BorderStyle(0)
+Gui.FMobileJ52Maint.ddlUser1fld.Create(DropDownList)
+Gui.FMobileJ52Maint.ddlUser1fld.Enabled(True)
+Gui.FMobileJ52Maint.ddlUser1fld.Visible(True)
+Gui.FMobileJ52Maint.ddlUser1fld.Zorder(0)
+Gui.FMobileJ52Maint.ddlUser1fld.Size(1500,300)
+Gui.FMobileJ52Maint.ddlUser1fld.Position(4710,3180)
+Gui.FMobileJ52Maint.ddlUser1fld.FontName("Tahoma")
+Gui.FMobileJ52Maint.ddlUser1fld.FontSize(8.25)
+Gui.FMobileJ52Maint.ddlUser1fld.Event(Click,ChangesMade)
+Gui.FMobileJ52Maint.lblUser2.Create(Label,"User_2",True,510,195,0,3990,3615,True,0,"Tahoma",8.25,,0,0)
+Gui.FMobileJ52Maint.lblUser2.BorderStyle(0)
+Gui.FMobileJ52Maint.ddlUser2fld.Create(DropDownList)
+Gui.FMobileJ52Maint.ddlUser2fld.Enabled(True)
+Gui.FMobileJ52Maint.ddlUser2fld.Visible(True)
+Gui.FMobileJ52Maint.ddlUser2fld.Zorder(0)
+Gui.FMobileJ52Maint.ddlUser2fld.Size(1500,300)
+Gui.FMobileJ52Maint.ddlUser2fld.Position(4710,3570)
+Gui.FMobileJ52Maint.ddlUser2fld.FontName("Tahoma")
+Gui.FMobileJ52Maint.ddlUser2fld.FontSize(8.25)
+Gui.FMobileJ52Maint.ddlUser2fld.Event(Click,ChangesMade)
+Gui.FMobileJ52Maint.lblUser3.Create(Label,"User_3",True,510,195,0,3990,4005,True,0,"Tahoma",8.25,,0,0)
+Gui.FMobileJ52Maint.lblUser3.BorderStyle(0)
+Gui.FMobileJ52Maint.ddlUser3fld.Create(DropDownList)
+Gui.FMobileJ52Maint.ddlUser3fld.Enabled(True)
+Gui.FMobileJ52Maint.ddlUser3fld.Visible(True)
+Gui.FMobileJ52Maint.ddlUser3fld.Zorder(0)
+Gui.FMobileJ52Maint.ddlUser3fld.Size(1500,300)
+Gui.FMobileJ52Maint.ddlUser3fld.Position(4725,3975)
+Gui.FMobileJ52Maint.ddlUser3fld.FontName("Tahoma")
+Gui.FMobileJ52Maint.ddlUser3fld.FontSize(8.25)
+Gui.FMobileJ52Maint.ddlUser3fld.Event(Click,ChangesMade)
+Gui.FMobileJ52Maint.lblUser4.Create(Label,"User_4",True,510,195,0,3990,4425,True,0,"Tahoma",8.25,,0,0)
+Gui.FMobileJ52Maint.lblUser4.BorderStyle(0)
+Gui.FMobileJ52Maint.ddlUser4fld.Create(DropDownList)
+Gui.FMobileJ52Maint.ddlUser4fld.Enabled(True)
+Gui.FMobileJ52Maint.ddlUser4fld.Visible(True)
+Gui.FMobileJ52Maint.ddlUser4fld.Zorder(0)
+Gui.FMobileJ52Maint.ddlUser4fld.Size(1500,300)
+Gui.FMobileJ52Maint.ddlUser4fld.Position(4725,4395)
+Gui.FMobileJ52Maint.ddlUser4fld.FontName("Tahoma")
+Gui.FMobileJ52Maint.ddlUser4fld.FontSize(8.25)
+Gui.FMobileJ52Maint.ddlUser4fld.Event(Click,ChangesMade)
+Gui.FMobileJ52Maint.lblUser5.Create(Label,"User_6",True,510,195,0,6360,3210,True,0,"Tahoma",8.25,,0,0)
+Gui.FMobileJ52Maint.lblUser5.BorderStyle(0)
+Gui.FMobileJ52Maint.lblUser6.Create(Label,"User_7",True,510,195,0,6375,3645,True,0,"Tahoma",8.25,,0,0)
+Gui.FMobileJ52Maint.lblUser6.BorderStyle(0)
+Gui.FMobileJ52Maint.lblUser7.Create(Label,"User_8",True,510,195,0,6375,4020,True,0,"Tahoma",8.25,,0,0)
+Gui.FMobileJ52Maint.lblUser7.BorderStyle(0)
+Gui.FMobileJ52Maint.lblUser8.Create(Label,"User_9",True,510,195,0,6375,4485,True,0,"Tahoma",8.25,,0,0)
+Gui.FMobileJ52Maint.lblUser8.BorderStyle(0)
+Gui.FMobileJ52Maint.lblUser9.Create(Label,"User_5",True,510,195,0,4005,4860,True,0,"Tahoma",8.25,,0,0)
+Gui.FMobileJ52Maint.lblUser9.BorderStyle(0)
+Gui.FMobileJ52Maint.ddlUser5fld.Create(DropDownList)
+Gui.FMobileJ52Maint.ddlUser5fld.Enabled(True)
+Gui.FMobileJ52Maint.ddlUser5fld.Visible(True)
+Gui.FMobileJ52Maint.ddlUser5fld.Zorder(0)
+Gui.FMobileJ52Maint.ddlUser5fld.Size(1500,300)
+Gui.FMobileJ52Maint.ddlUser5fld.Position(4725,4815)
+Gui.FMobileJ52Maint.ddlUser5fld.FontName("Tahoma")
+Gui.FMobileJ52Maint.ddlUser5fld.FontSize(8.25)
+Gui.FMobileJ52Maint.ddlUser5fld.Event(Click,ChangesMade)
+Gui.FMobileJ52Maint.ddlUser6fld.Create(DropDownList)
+Gui.FMobileJ52Maint.ddlUser6fld.Enabled(True)
+Gui.FMobileJ52Maint.ddlUser6fld.Visible(True)
+Gui.FMobileJ52Maint.ddlUser6fld.Zorder(0)
+Gui.FMobileJ52Maint.ddlUser6fld.Size(1500,300)
+Gui.FMobileJ52Maint.ddlUser6fld.Position(7050,3195)
+Gui.FMobileJ52Maint.ddlUser6fld.FontName("Tahoma")
+Gui.FMobileJ52Maint.ddlUser6fld.FontSize(8.25)
+Gui.FMobileJ52Maint.ddlUser6fld.Event(Click,ChangesMade)
+Gui.FMobileJ52Maint.ddlUser7fld.Create(DropDownList)
+Gui.FMobileJ52Maint.ddlUser7fld.Enabled(True)
+Gui.FMobileJ52Maint.ddlUser7fld.Visible(True)
+Gui.FMobileJ52Maint.ddlUser7fld.Zorder(0)
+Gui.FMobileJ52Maint.ddlUser7fld.Size(1500,300)
+Gui.FMobileJ52Maint.ddlUser7fld.Position(7050,3630)
+Gui.FMobileJ52Maint.ddlUser7fld.FontName("Tahoma")
+Gui.FMobileJ52Maint.ddlUser7fld.FontSize(8.25)
+Gui.FMobileJ52Maint.ddlUser7fld.Event(Click,ChangesMade)
+Gui.FMobileJ52Maint.ddlUser8fld.Create(DropDownList)
+Gui.FMobileJ52Maint.ddlUser8fld.Enabled(True)
+Gui.FMobileJ52Maint.ddlUser8fld.Visible(True)
+Gui.FMobileJ52Maint.ddlUser8fld.Zorder(0)
+Gui.FMobileJ52Maint.ddlUser8fld.Size(1500,300)
+Gui.FMobileJ52Maint.ddlUser8fld.Position(7050,4020)
+Gui.FMobileJ52Maint.ddlUser8fld.FontName("Tahoma")
+Gui.FMobileJ52Maint.ddlUser8fld.FontSize(8.25)
+Gui.FMobileJ52Maint.ddlUser8fld.Event(Click,ChangesMade)
+Gui.FMobileJ52Maint.ddlUser9fld.Create(DropDownList)
+Gui.FMobileJ52Maint.ddlUser9fld.Enabled(True)
+Gui.FMobileJ52Maint.ddlUser9fld.Visible(True)
+Gui.FMobileJ52Maint.ddlUser9fld.Zorder(0)
+Gui.FMobileJ52Maint.ddlUser9fld.Size(1500,300)
+Gui.FMobileJ52Maint.ddlUser9fld.Position(7035,4440)
+Gui.FMobileJ52Maint.ddlUser9fld.FontName("Tahoma")
+Gui.FMobileJ52Maint.ddlUser9fld.FontSize(8.25)
+Gui.FMobileJ52Maint.ddlUser9fld.Event(Click,ChangesMade)
+Gui.FMobileJ52Maint.lbl2.Create(Label,"*WO format can be job-suffix or $%jobsuffixsequence",True,3960,195,0,675,2985,True,0,"Tahoma",8.25,,0,0)
+Gui.FMobileJ52Maint.lbl2.BorderStyle(0)
+Gui.FMobileJ52Maint.lbl2.ForeColor(255)
+Gui.FMobileJ52Maint.txtclosemethod.Create(TextBox,"",True,1500,300,0,2070,2235,True,0,"Tahoma",8.25,,1)
+Gui.FMobileJ52Maint.txtclosemethod.Locked(True)
+Gui.FMobileJ52Maint.lblclosemethod.Create(Label,"Partial close method",True,1440,195,0,465,2310,True,0,"Tahoma",8.25,,0,0)
+Gui.FMobileJ52Maint.lblclosemethod.BorderStyle(0)
+Gui.FMobileJ52Maint.lbldefaultprinter.Create(Label,"*Default Printer used if no mobile user printer assigned",True,3945,195,0,4740,1890,True,0,"Tahoma",8.25,,0,0)
+Gui.FMobileJ52Maint.lbldefaultprinter.BorderStyle(0)
+Gui.FMobileJ52Maint.lbldefaultprinter.ForeColor(255)
+Gui.FMobileJ52Maint.lbl3.Create(Label,"Auto Lot",True,615,195,0,3945,2310,True,0,"Tahoma",8.25,,0,0)
+Gui.FMobileJ52Maint.lbl3.BorderStyle(0)
+Gui.FMobileJ52Maint.txtautolot.Create(TextBox,"",True,2130,300,0,4680,2250,True,0,"Tahoma",8.25,,1)
+Gui.FMobileJ52Maint.txtautolot.Locked(True)
+Gui.FMobileJ52Maint.lblmanualclose.Create(Label,"Close?",True,465,195,0,3990,5295,True,0,"Tahoma",8.25,,0,0)
+Gui.FMobileJ52Maint.lblmanualclose.BorderStyle(0)
+Gui.FMobileJ52Maint.ddlmanualclose.Create(DropDownList)
+Gui.FMobileJ52Maint.ddlmanualclose.Enabled(True)
+Gui.FMobileJ52Maint.ddlmanualclose.Visible(True)
+Gui.FMobileJ52Maint.ddlmanualclose.Zorder(0)
+Gui.FMobileJ52Maint.ddlmanualclose.Size(1500,300)
+Gui.FMobileJ52Maint.ddlmanualclose.Position(4725,5220)
+Gui.FMobileJ52Maint.ddlmanualclose.FontName("Tahoma")
+Gui.FMobileJ52Maint.ddlmanualclose.FontSize(8.25)
+Gui.FMobileJ52Maint.ddlmanualclose.Event(Click,ChangesMade)
+Gui.FMobileJ52Maint.ddllabelqty.Create(DropDownList)
+Gui.FMobileJ52Maint.ddllabelqty.Enabled(True)
+Gui.FMobileJ52Maint.ddllabelqty.Visible(True)
+Gui.FMobileJ52Maint.ddllabelqty.Zorder(0)
+Gui.FMobileJ52Maint.ddllabelqty.Size(1500,300)
+Gui.FMobileJ52Maint.ddllabelqty.Position(7035,4830)
+Gui.FMobileJ52Maint.ddllabelqty.FontName("Tahoma")
+Gui.FMobileJ52Maint.ddllabelqty.FontSize(8.25)
+Gui.FMobileJ52Maint.ddllabelqty.Event(Click,ChangesMade)
+Gui.FMobileJ52Maint.lbllabelqty.Create(Label,"Label Qty",True,690,195,0,6255,4860,True,0,"Tahoma",8.25,,0,0)
+Gui.FMobileJ52Maint.lbllabelqty.BorderStyle(0)
+Gui.FMobileJ52Maint.chkcartonlabels.Create(CheckBox)
+Gui.FMobileJ52Maint.chkcartonlabels.Enabled(True)
+Gui.FMobileJ52Maint.chkcartonlabels.Visible(True)
+Gui.FMobileJ52Maint.chkcartonlabels.Zorder(0)
+Gui.FMobileJ52Maint.chkcartonlabels.Size(1860,300)
+Gui.FMobileJ52Maint.chkcartonlabels.Position(6840,1170)
+Gui.FMobileJ52Maint.chkcartonlabels.Caption("Calc Carton Labels")
+Gui.FMobileJ52Maint.chkcartonlabels.FontName("Tahoma")
+Gui.FMobileJ52Maint.chkcartonlabels.FontSize(8.25)
+Gui.FMobileJ52Maint.chkcartonlabels.Event(Change,ChangesMade)
+Gui.FormLockNotifications..Create(BaseForm)
+Gui.FormLockNotifications..Caption("Lock Notifications")
+Gui.FormLockNotifications..Size(7695,5220)
+Gui.FormLockNotifications..MinX(0)
+Gui.FormLockNotifications..MinY(0)
+Gui.FormLockNotifications..Position(0,0)
+Gui.FormLockNotifications..AlwaysOnTop(True)
+Gui.FormLockNotifications..BackColor(-2147483633)
+Gui.FormLockNotifications..MaxButton(False)
+Gui.FormLockNotifications..MinButton(False)
+Gui.FormLockNotifications..MousePointer(0)
+Gui.FormLockNotifications..Event(UnLoad,FormLockNotifications_UnLoad)
+Gui.FormLockNotifications..FontName("Tahoma")
+Gui.FormLockNotifications..FontSize(8.25)
+Gui.FormLockNotifications..ControlBox(True)
+Gui.FormLockNotifications..Moveable(True)
+Gui.FormLockNotifications..Sizeable(True)
+Gui.FormLockNotifications..ShowInTaskBar(True)
+Gui.FormLockNotifications..TitleBar(True)
+Gui.FormLockNotifications.lblAntenna.Create(Label,"Antenna",True,795,255,0,75,150,True,0,"Arial",8,-2147483633,0,0)
+Gui.FormLockNotifications.lblAntenna.BorderStyle(0)
+Gui.FormLockNotifications.txtAntenna.Create(TextBox,"",True,1680,300,0,75,360,False,0,"Arial",8,-2147483643,1)
+Gui.FormLockNotifications.lblReader.Create(Label,"Reader",True,1935,255,0,1875,150,True,0,"Arial",8,-2147483633,0,0)
+Gui.FormLockNotifications.lblReader.BorderStyle(0)
+Gui.FormLockNotifications.txtReader.Create(TextBox,"",True,1680,300,0,1875,360,False,0,"Arial",8,-2147483643,1)
+Gui.FormLockNotifications.lblTransaction.Create(Label,"Transaction",True,1110,255,0,3675,150,True,0,"Arial",8,-2147483633,0,0)
+Gui.FormLockNotifications.lblTransaction.BorderStyle(0)
+Gui.FormLockNotifications.txtTransaction.Create(TextBox,"",True,705,300,0,3675,360,False,0,"Arial",8,-2147483643,1)
+Gui.FormLockNotifications.chkLockNotifications.Create(CheckBox)
+Gui.FormLockNotifications.chkLockNotifications.Size(2745,300)
+Gui.FormLockNotifications.chkLockNotifications.Position(75,690)
+Gui.FormLockNotifications.chkLockNotifications.Caption("Send WO Locked Notifications")
+Gui.FormLockNotifications.chkLockNotifications.Event(Click,chkLockNotifications_Click)
+Gui.FormLockNotifications.chkLockNotifications.Enabled(True)
+Gui.FormLockNotifications.chkLockNotifications.Visible(True)
+Gui.FormLockNotifications.chkLockNotifications.Zorder(0)
+Gui.FormLockNotifications.chkLockNotifications.FontName("Tahoma")
+Gui.FormLockNotifications.chkLockNotifications.FontSize(8.25)
+Gui.FormLockNotifications.lblSenderEmailAddress.Create(Label,"Sender Email Address",True,1935,255,0,75,1170,True,0,"Arial",8,-2147483633,0,0)
+Gui.FormLockNotifications.lblSenderEmailAddress.BorderStyle(0)
+Gui.FormLockNotifications.txtSender.Create(TextBox,"",True,7440,300,0,75,1380,True,0,"Arial",8,-2147483643,1)
+Gui.FormLockNotifications.lblRecipientEmailAddress.Create(Label,"Recipient Email Addresses",True,1935,255,0,90,2025,True,0,"Arial",8,-2147483633,0,0)
+Gui.FormLockNotifications.lblRecipientEmailAddress.BorderStyle(0)
+Gui.FormLockNotifications.txtRecipientAddresses.Create(TextboxM)
+Gui.FormLockNotifications.txtRecipientAddresses.Size(7440,2220)
+Gui.FormLockNotifications.txtRecipientAddresses.Position(90,2235)
+Gui.FormLockNotifications.txtRecipientAddresses.ToolTip("Multiple addresses can be delimited by commas.")
+Gui.FormLockNotifications.txtRecipientAddresses.Enabled(True)
+Gui.FormLockNotifications.txtRecipientAddresses.Visible(True)
+Gui.FormLockNotifications.txtRecipientAddresses.Zorder(0)
+Gui.FormLockNotifications.txtRecipientAddresses.FontName("Tahoma")
+Gui.FormLockNotifications.txtRecipientAddresses.FontSize(8.25)
+Gui.FormLockNotifications.cmdSaveLockNotifications.Create(Button)
+Gui.FormLockNotifications.cmdSaveLockNotifications.Size(855,375)
+Gui.FormLockNotifications.cmdSaveLockNotifications.Position(6675,4485)
+Gui.FormLockNotifications.cmdSaveLockNotifications.Caption("Save")
+Gui.FormLockNotifications.cmdSaveLockNotifications.Event(Click,cmdSaveLockNotifications_Click)
+Gui.FormLockNotifications.cmdSaveLockNotifications.Enabled(True)
+Gui.FormLockNotifications.cmdSaveLockNotifications.Visible(True)
+Gui.FormLockNotifications.cmdSaveLockNotifications.Zorder(0)
+Gui.FormLockNotifications.cmdSaveLockNotifications.FontName("Tahoma")
+Gui.FormLockNotifications.cmdSaveLockNotifications.FontSize(8.25)
+Program.Sub.ScreenSU.End
+Program.Sub.Preflight.Start
+V.Global.sAntenna.Declare(String)
+V.Global.bSave.Declare(Boolean,False)
+V.Global.sReader.Declare(String)
+V.Global.bError.Declare(Boolean, False)
+Program.Sub.Preflight.End
+Program.Sub.Main.Start
+'Programmed by Brady for M-Industries
+'Maintenance program for custom mobile WIP to FG
+
+F.Intrinsic.Control.Try
+
+F.ODBC.Connection!Con.OpenCompanyConnection(300)
+F.Intrinsic.Control.CallSub(SetIcon)
+
+gui.FMobileJ52Maint..Show
+F.Intrinsic.Control.CallSub(LoadCloseDropDown)
+F.Intrinsic.Control.CallSub(LoadFieldList)
+F.Intrinsic.Control.CallSub(loadoptions)
+F.Intrinsic.Control.BlockEvents
+gui.FMobileJ52Maint..Enabled(False)
+F.Intrinsic.Control.CallSub(LoadData)
+gui.FMobileJ52Maint.frameParent.Enabled(True)
+gui.FMobileJ52Maint.cmdSave.Enabled(False)
+gui.FMobileJ52Maint.cmdRefresh.Enabled(True)
+V.Global.bSave.Set(False)
+
+F.Intrinsic.Control.UnBlockEvents
+gui.FMobileJ52Maint..Enabled(True)
+gui.FMobileJ52Maint..SetFocus
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(ErrorMessage, "ErrorNumber", V.Ambient.ErrorNumber, "ErrorDescription", V.Ambient.ErrorDescription, "Subroutine", V.Ambient.CurrentSubroutine, "Callback", "FMobileJ52Maint_Unload")
+F.Intrinsic.Control.EndTry
+Program.Sub.Main.End
+Program.Sub.LoadGrid.Start
+F.Intrinsic.Control.Try
+
+V.Local.bCheck.Declare(Boolean)
+
+gui.FMobileJ52Maint..Enabled(False)
+gui.FMobileJ52Maint.GsGCAntReadList.SuspendLayout
+
+F.Intrinsic.Control.If(V.DataTable.AntListAct.Exists)
+	F.Intrinsic.Control.If(V.DataView.AntListAct!AntListVw.Exists)
+		F.Data.DataView.Close("AntListAct","AntListVw")
+	F.Intrinsic.Control.EndIf
+	F.Data.DataTable.Close("AntListAct")
+F.Intrinsic.Control.EndIf
+
+F.Data.DataTable.CreateFromSQL("AntListAct","Con","SELECT Distinct Antenna, Reader from GCG_5235_RFID_HDWR order by reader, antenna",True)
+F.Data.DataView.Create("AntListAct","AntListVw",22)
+
+gui.FMobileJ52Maint.GsGCAntReadList.AddGridviewFromDataview("gvAntennas","AntListAct","AntListVw")
+
+gui.FMobileJ52Maint.GsGCAntReadList.SetColumnProperty("gvAntennas","Antenna","headerforecolor", V.Color.PRI-GSS-00)
+gui.FMobileJ52Maint.GsGCAntReadList.SetColumnProperty("gvAntennas","Antenna","headerfontbold", True)
+gui.FMobileJ52Maint.GsGCAntReadList.SetColumnProperty("gvAntennas","Antenna","caption","Antenna Name")
+gui.FMobileJ52Maint.GsGCAntReadList.SetColumnProperty("gvAntennas","Antenna","readonly", True)
+gui.FMobileJ52Maint.GsGCAntReadList.SetColumnProperty("gvAntennas","Antenna","allowedit", False)
+gui.FMobileJ52Maint.GsGCAntReadList.SetColumnProperty("gvAntennas","Antenna","MinWidth", 150)
+
+gui.FMobileJ52Maint.GsGCAntReadList.SetColumnProperty("gvAntennas","Reader","headerforecolor", V.Color.PRI-GSS-00)
+gui.FMobileJ52Maint.GsGCAntReadList.SetColumnProperty("gvAntennas","Reader","headerfontbold", True)
+gui.FMobileJ52Maint.GsGCAntReadList.SetColumnProperty("gvAntennas","Reader","caption","Parent Reader")
+gui.FMobileJ52Maint.GsGCAntReadList.SetColumnProperty("gvAntennas","Reader","readonly", True)
+gui.FMobileJ52Maint.GsGCAntReadList.SetColumnProperty("gvAntennas","Reader","allowedit", False)
+gui.FMobileJ52Maint.GsGCAntReadList.SetColumnProperty("gvAntennas","Reader","MinWidth", 150)
+
+gui.FMobileJ52Maint.GsGCAntReadList.SetGridviewProperty("gvAntennas","Enableappearanceoddrow",True)
+gui.FMobileJ52Maint.GsGCAntReadList.SetGridviewProperty("gvAntennas","OptionsFindAlwaysVisible",True)
+gui.FMobileJ52Maint.GsGCAntReadList.SetGridviewProperty("gvAntennas","Showgrouppanel",False)
+
+gui.FMobileJ52Maint.GsGCAntReadList.SetGridviewProperty("gvAntennas","OptionsViewShowAutoFilterRow",False)
+
+gui.FMobileJ52Maint.GsGCAntReadList.MainView("gvAntennas")
+
+gui.FMobileJ52Maint.GsGCAntReadList.ResumeLayout
+gui.FMobileJ52Maint..Enabled(True)
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(ErrorMessage, "ErrorNumber", V.Ambient.ErrorNumber, "ErrorDescription", V.Ambient.ErrorDescription, "Subroutine", V.Ambient.CurrentSubroutine, "Callback", "FMobileJ52Maint_Unload")
+F.Intrinsic.Control.EndTry
+Program.Sub.LoadGrid.End
+Program.Sub.GsGCAntReadList_RowCellClick.Start
+F.Intrinsic.Control.Try
+
+V.Local.iCount.Declare(Long)
+V.Local.sSQL.Declare(String)
+V.Local.iX.Declare(Long)
+V.Local.iY.Declare(Long)
+
+F.Intrinsic.Control.If(V.Args.clicks,>,1,"AND",V.Args.button,=,"Left")
+	
+	F.Intrinsic.Control.BlockEvents
+	gui.FMobileJ52Maint..Enabled(False)
+	V.Global.sAntenna.Set(V.DataTable.AntListAct(V.Args.RowHandle).Antenna!fieldVal)
+	V.Global.sReader.Set(V.DataTable.AntListAct(V.Args.RowHandle).Reader!fieldVal)
+	gui.FMobileJ52Maint.txtAntName.Text(V.Global.sAntenna)
+	gui.FMobileJ52Maint.txtReader.Text(V.Global.sReader)
+	F.Intrinsic.Control.CallSub(LoadData)
+	gui.FMobileJ52Maint.frameParent.Enabled(True)
+	gui.FMobileJ52Maint.cmdSave.Enabled(False)
+	gui.FMobileJ52Maint.cmdRefresh.Enabled(False)
+	V.Global.bSave.Set(False)
+
+	F.Intrinsic.Control.UnBlockEvents
+	gui.FMobileJ52Maint..Enabled(True)
+	gui.FMobileJ52Maint..SetFocus
+F.Intrinsic.Control.EndIf
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(ErrorMessage, "ErrorNumber", V.Ambient.ErrorNumber, "ErrorDescription", V.Ambient.ErrorDescription, "Subroutine", V.Ambient.CurrentSubroutine, "Callback", "FMobileJ52Maint_Unload")
+F.Intrinsic.Control.EndTry
+Program.Sub.GsGCAntReadList_RowCellClick.End
+Program.Sub.LoadData.Start
+F.Intrinsic.Control.Try
+
+V.Local.iCount.Declare(Long)
+V.Local.iflag.Declare(Long)
+V.Local.sTransCode.Declare(String)
+V.Local.sSQL.Declare(String)
+V.Local.sRet.Declare(String)
+V.Local.sExtraOption.Declare(String)
+
+F.Intrinsic.Control.CallSub(ClearOptions)
+
+F.Intrinsic.Control.If(V.DataTable.dtAntennaData.Exists,=,True)
+	F.Data.DataTable.Close("dtAntennaData")
+F.Intrinsic.Control.EndIf
+
+'F.Intrinsic.String.Build("Select * from GCG_5235_RFID_MAINT where antenna = '{0}' and READER = '{1}'",V.Global.sAntenna, V.Global.sReader, V.Local.sSQL)
+
+F.Intrinsic.String.Build("Select * from GAB_6588_J52_MAINT where TX_CODE = '{0}'","J52", V.Local.sSQL)
+F.Data.DataTable.CreateFromSQL("dtAntennaData","Con",V.Local.sSQL,True)
+f.Intrinsic.Control.If(v.DataTable.dtAntennaData.RowCount,=,0)
+	f.Data.Datatable.AddRow("dtAntennaData","TX_CODE","J52","PRINT_FLAG","False","ENABLED","False","CARTON_LABELS","False")
+	F.Data.DataTable.SaveToDB("dtAntennaData","Con","GAB_6588_J52_MAINT","TX_CODE",256,"TX_CODE@!@TX_CODE*!*PRINT_FLAG@!@PRINT_FLAG*!*ENABLED@!@ENABLED*!*CARTON_LABELS@!@CARTON_LABELS")	
+f.Intrinsic.Control.Else
+	F.Intrinsic.Control.For(V.Local.iCount,0,V.DataTable.dtAntennaData.RowCount--,1)
+		V.Local.sTransCode.Set(V.DataTable.dtAntennaData(V.Local.iCount).TX_CODE!fieldVal)
+		F.Intrinsic.Control.SelectCase(V.Local.sTransCode)			
+			F.Intrinsic.Control.Case("J52")
+				F.Intrinsic.Control.If(V.DataTable.dtAntennaData(V.Local.iCount).Enabled!FieldVal,=,"True")
+					V.Local.iflag.Set(1)
+				F.Intrinsic.Control.Else
+					V.Local.iflag.Set(0)
+				F.Intrinsic.Control.EndIf
+				gui.FMobileJ52Maint.chkJ52.Value(V.Local.iflag)
+				gui.FMobileJ52Maint.txtToBinJ52.Text(V.DataTable.dtAntennaData(V.Local.iCount).TOBIN!FieldVal)
+				
+				F.Intrinsic.Control.If(V.DataTable.dtAntennaData(V.Local.iCount).PRINT_FLAG!FieldVal,=,"True")
+					V.Local.iflag.Set(1)
+				F.Intrinsic.Control.Else
+					V.Local.iflag.Set(0)
+				F.Intrinsic.Control.EndIf
+				gui.FMobileJ52Maint.chkPrintJ52.Value(V.Local.iflag)
+				gui.FMobileJ52Maint.txtPrinterJ52.Text(V.DataTable.dtAntennaData(V.Local.iCount).PRINTER!FieldVal)
+				gui.FMobileJ52Maint.txtcopiesJ52.Text(V.DataTable.dtAntennaData(V.Local.iCount).LABEL_COPIES!FieldVal)
+	
+				
+				'Load field mapping
+				gui.FMobileJ52Maint.ddlWOfld.Text(V.DataTable.dtAntennaData(V.Local.iCount).FIELD_WO!FieldValTrim)
+				gui.FMobileJ52Maint.ddlQtyfld.Text(V.DataTable.dtAntennaData(V.Local.iCount).FIELD_QTY!FieldValTrim)
+				gui.FMobileJ52Maint.ddlLotfld.Text(V.DataTable.dtAntennaData(V.Local.iCount).FIELD_LOT!FieldValTrim)
+				gui.FMobileJ52Maint.ddlBinfld.Text(V.DataTable.dtAntennaData(V.Local.iCount).FIELD_BIN!FieldValTrim)
+				gui.FMobileJ52Maint.ddlHeatfld.Text(V.DataTable.dtAntennaData(V.Local.iCount).FIELD_HEAT!FieldValTrim)
+				gui.FMobileJ52Maint.ddlSerialfld.Text(V.DataTable.dtAntennaData(V.Local.iCount).FIELD_SERIAL!FieldValTrim)
+				gui.FMobileJ52Maint.ddlUser1fld.Text(V.DataTable.dtAntennaData(V.Local.iCount).FIELD_USER1!FieldValTrim)
+				gui.FMobileJ52Maint.ddlUser2fld.Text(V.DataTable.dtAntennaData(V.Local.iCount).FIELD_USER2!FieldValTrim)
+				gui.FMobileJ52Maint.ddlUser3fld.Text(V.DataTable.dtAntennaData(V.Local.iCount).FIELD_USER3!FieldValTrim)
+				gui.FMobileJ52Maint.ddlUser4fld.Text(V.DataTable.dtAntennaData(V.Local.iCount).FIELD_USER4!FieldValTrim)
+				gui.FMobileJ52Maint.ddlUser5fld.Text(V.DataTable.dtAntennaData(V.Local.iCount).FIELD_USER5!FieldValTrim)
+				gui.FMobileJ52Maint.ddlUser6fld.Text(V.DataTable.dtAntennaData(V.Local.iCount).FIELD_USER6!FieldValTrim)
+				gui.FMobileJ52Maint.ddlUser7fld.Text(V.DataTable.dtAntennaData(V.Local.iCount).FIELD_USER7!FieldValTrim)
+				gui.FMobileJ52Maint.ddlUser8fld.Text(V.DataTable.dtAntennaData(V.Local.iCount).FIELD_USER8!FieldValTrim)
+				gui.FMobileJ52Maint.ddlUser9fld.Text(V.DataTable.dtAntennaData(V.Local.iCount).FIELD_USER9!FieldValTrim)
+				gui.FMobileJ52Maint.ddlmanualclose.Text(V.DataTable.dtAntennaData(V.Local.iCount).FIELD_MANUAL_CLOSE!FieldValTrim)
+				'add new mapping field for LABEL_QTY AND CARTON LABELS FLAG
+				gui.FMobileJ52Maint.ddllabelqty.Text(V.DataTable.dtAntennaData(V.Local.iCount).FIELD_LABEL_QTY!FieldValTrim)
+				gui.FMobileJ52Maint.chkcartonlabels.Value(V.DataTable.dtAntennaData(V.Local.iCount).CARTON_LABELS!FieldValTrim)
+				
+				F.Intrinsic.String.Split(V.DataTable.dtAntennaData(V.Local.iCount).EXTRA_OPTION!FieldValTrim, "!@#$#@!", V.Local.sExtraOption)
+				F.Intrinsic.Control.If(V.Local.sExtraOption(0), =, "DEFAULT")
+					gui.FMobileJ52Maint.chkDefaultBin.Value(True)
+				F.Intrinsic.Control.ElseIf(V.Local.sExtraOption(0), =, "STOCKING")
+					gui.FMobileJ52Maint.chkStockingBin.Value(True)
+				F.Intrinsic.Control.EndIf
+				
+				F.Intrinsic.Control.If(V.Local.sExtraOption.UBound, >, 0)
+					gui.FMobileJ52Maint.ddlCloseJ52.Text(V.Local.sExtraOption(1).Trim)
+				F.Intrinsic.Control.EndIf
+				
+				f.Intrinsic.Control.If(V.Screen.FMobileJ52Maint!ddlCloseJ52.Text.Trim,=,"Always Close")
+					gui.FMobileJ52Maint.ddlmanualclose.Text("N/A")
+					gui.FMobileJ52Maint.ddlmanualclose.Enabled(false)
+				f.Intrinsic.Control.Else
+					gui.FMobileJ52Maint.ddlmanualclose.Enabled(true)
+				f.Intrinsic.Control.EndIf
+				
+				F.intrinsic.Control.CallSub(ToggleTransactionEnabled, "CONTROLNAME", "chkJ52")
+				F.Intrinsic.Control.CallSub(CheckPrinterClicked, "CONTROLNAME", "chkPrintJ52")
+				'F.intrinsic.Control.CallSub(chkNotifyJ52_Click)					
+				
+			F.Intrinsic.Control.CaseElse
+				F.Intrinsic.Control.ExitSub
+		F.Intrinsic.Control.EndSelect
+		
+	F.Intrinsic.Control.Next(V.Local.iCount)
+f.Intrinsic.Control.EndIf
+
+gui.FMobileJ52Maint..Enabled(True)
+
+'update last read date/time
+'F.Intrinsic.String.Build("Select DATEANDTIME from GCG_5235_RFID_HDWR where antenna = '{0}' and READER = '{1}'", V.Global.sAntenna, V.Global.sReader, V.Local.sSQL)
+'F.ODBC.Connection!con.ExecuteAndReturn(V.Local.sSQL, V.Local.sRet)
+'gui.FMobileJ52Maint.txtLastRead.Text(V.Local.sRet.Trim)
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(ErrorMessage, "ErrorNumber", V.Ambient.ErrorNumber, "ErrorDescription", V.Ambient.ErrorDescription, "Subroutine", V.Ambient.CurrentSubroutine, "Callback", "FMobileJ52Maint_Unload")
+F.Intrinsic.Control.EndTry
+Program.Sub.LoadData.End
+Program.Sub.cmdSave_Click.Start
+F.Intrinsic.Control.Try
+
+V.Local.bJ55.Declare(Boolean)
+V.Local.bJ52.Declare(Boolean)
+V.Local.bO90.Declare(Boolean)
+V.Local.bCheck.Declare(Boolean)
+V.Local.bSend.Declare(Boolean)
+V.Local.bRec.Declare(Boolean)
+V.Local.sEmailID.Declare(String)
+V.Local.sExtraOption.Declare(String)
+
+
+gui.FMobileJ52Maint..Enabled(False)
+
+
+'check and save J52 Options
+
+f.Intrinsic.Control.If(V.Screen.FMobileJ52Maint!chkPrintJ52.CheckedAsBoolean,=,True)
+	f.Intrinsic.Control.If(V.Screen.FMobileJ52Maint!txtcopiesJ52.Text,<,"1")
+		GUI.FMobileJ52Maint.txtcopiesJ52.Text("1")
+	f.Intrinsic.Control.EndIf
+f.Intrinsic.Control.EndIf
+
+F.Data.DataView.Create("dtAntennaData","J52VW",22,"TX_CODE = 'J52'","")
+F.Intrinsic.control.If(V.Screen.FMobileJ52Maint!chkJ52.CheckedAsBoolean,=,True)
+	F.Data.DataView.SetValue("dtAntennaData","J52VW",-1,"ENABLED",True,"TOBIN",V.Screen.FMobileJ52Maint!txtToBinJ52.Text)
+	F.Data.DataTable.AcceptChanges("dtAntennaData")
+	gui.FMobileJ52Maint.lblJ52W.Visible(False)
+	
+	'extra options
+	F.Intrinsic.Control.If(V.Screen.FMobileJ52Maint!chkDefaultBin.CheckedAsBoolean)
+		V.Local.sExtraOption.Set("DEFAULT")
+	F.Intrinsic.Control.ElseIf(V.Screen.FMobileJ52Maint!chkStockingBin.CheckedAsBoolean)
+		V.Local.sExtraOption.Set("STOCKING")
+	F.Intrinsic.Control.Else
+		V.Local.sExtraOption.Set("")
+	F.Intrinsic.Control.EndIf
+	
+	'save override flag
+'	F.Intrinsic.String.Build("{0}!@#$#@!{1}", V.Local.sExtraOption, V.Screen.FMobileJ52Maint!chkOverrideLabelQuantity.CheckedAsBoolean, V.Local.sExtraOption)
+	
+	'save close option
+	F.Intrinsic.String.Build("{0}!@#$#@!{1}", V.Local.sExtraOption, V.Screen.FMobileJ52Maint!ddlCloseJ52.Text.Trim, V.Local.sExtraOption)
+	
+	F.Data.DataView.SetValue("dtAntennaData","J52VW",-1, "EXTRA_OPTION", V.Local.sExtraOption)
+	F.Data.DataTable.AcceptChanges("dtAntennaData")
+	
+	F.Intrinsic.Control.If(V.Screen.FMobileJ52Maint!chkPrintJ52.CheckedAsBoolean,=,True)
+		F.intrinsic.Control.If(V.Screen.FMobileJ52Maint!txtPrinterJ52.Text.trim,=,"")
+			'gui.FMobileJ52Maint.lblJ52P.Visible(True)
+			V.Local.bJ52.Set(True)
+		F.Intrinsic.Control.Else
+			F.Data.DataView.SetValue("dtAntennaData","J52VW",-1,"PRINT_FLAG",True,"PRINTER",V.Screen.FMobileJ52Maint!txtPrinterJ52.Text,"LABEL_COPIES",V.Screen.FMobileJ52Maint!txtcopiesJ52.Text)			
+			F.Data.DataTable.AcceptChanges("dtAntennaData")
+			'gui.FMobileJ52Maint.lblJ52P.Visible(False)
+		F.Intrinsic.Control.EndIf
+	F.Intrinsic.Control.Else
+		F.Data.DataView.SetValue("dtAntennaData","J52VW",-1,"PRINT_FLAG",False)
+	F.Intrinsic.Control.EndIf
+	
+	'save form field mappings
+	F.Data.DataView.SetValue("dtAntennaData","J52VW",-1,"FIELD_WO",V.Screen.FMobileJ52Maint!ddlWOfld.Text,"FIELD_QTY",V.Screen.FMobileJ52Maint!ddlQtyfld.Text,"FIELD_LOT",V.Screen.FMobileJ52Maint!ddlLotfld.Text,"FIELD_BIN",V.Screen.FMobileJ52Maint!ddlbinfld.Text,"FIELD_HEAT",V.Screen.FMobileJ52Maint!ddlHeatfld.Text,"FIELD_SERIAL",V.Screen.FMobileJ52Maint!ddlSerialfld.Text,"FIELD_USER1",V.Screen.FMobileJ52Maint!ddluser1fld.Text,"FIELD_USER2",V.Screen.FMobileJ52Maint!ddlUser2fld.Text,"FIELD_USER3",V.Screen.FMobileJ52Maint!ddlUser3fld.Text,"FIELD_USER4",V.Screen.FMobileJ52Maint!ddlUser4fld.Text,"FIELD_USER5",V.Screen.FMobileJ52Maint!ddlUser5fld.Text,"FIELD_USER6",V.Screen.FMobileJ52Maint!ddlUser6fld.Text,"FIELD_USER7",V.Screen.FMobileJ52Maint!ddlUser7fld.Text,"FIELD_USER8",V.Screen.FMobileJ52Maint!ddlUser8fld.Text,"FIELD_USER9",V.Screen.FMobileJ52Maint!ddlUser9fld.Text,"FIELD_MANUAL_CLOSE",V.Screen.FMobileJ52Maint!ddlmanualclose.Text,"FIELD_LABEL_QTY",V.Screen.FMobileJ52Maint!ddllabelqty.Text,"CARTON_LABELS",V.Screen.FMobileJ52Maint!chkcartonlabels.Value)
+	
+	
+F.Intrinsic.Control.Else
+	F.Data.DataView.SetValue("dtAntennaData","J52VW",-1,"Enabled",False)
+F.Intrinsic.Control.EndIf
+F.Data.Dataview.Close("dtAntennaData","J52VW")
+
+F.Data.DataTable.SaveToDB("dtAntennaData","Con","GAB_6588_J52_MAINT","TX_CODE",256,"ENABLED@!@ENABLED*!*TX_CODE@!@TX_CODE*!*TOBIN@!@TOBIN*!*PRINT_FLAG@!@PRINT_FLAG*!*PRINTER@!@PRINTER*!*EXTRA_OPTION@!@EXTRA_OPTION*!*LABEL_COPIES@!@LABEL_COPIES*!*FIELD_WO@!@FIELD_WO*!*FIELD_QTY@!@FIELD_QTY*!*FIELD_LOT@!@FIELD_LOT*!*FIELD_BIN@!@FIELD_BIN*!*FIELD_HEAT@!@FIELD_HEAT*!*FIELD_SERIAL@!@FIELD_SERIAL*!*FIELD_USER1@!@FIELD_USER1*!*FIELD_USER2@!@FIELD_USER2*!*FIELD_USER3@!@FIELD_USER3*!*FIELD_USER4@!@FIELD_USER4*!*FIELD_USER5@!@FIELD_USER5*!*FIELD_USER6@!@FIELD_USER6*!*FIELD_USER7@!@FIELD_USER7*!*FIELD_USER8@!@FIELD_USER8*!*FIELD_USER9@!@FIELD_USER9*!*FIELD_MANUAL_CLOSE@!@FIELD_MANUAL_CLOSE*!*FIELD_LABEL_QTY@!@FIELD_LABEL_QTY*!*CARTON_LABELS@!@CARTON_LABELS")
+
+gui.FMobileJ52Maint..Enabled(True)
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(ErrorMessage, "ErrorNumber", V.Ambient.ErrorNumber, "ErrorDescription", V.Ambient.ErrorDescription, "Subroutine", V.Ambient.CurrentSubroutine, "Callback", "FMobileJ52Maint_Unload")
+F.Intrinsic.Control.EndTry
+Program.Sub.cmdSave_Click.End
+
+Program.Sub.FMobileJ52Maint_Unload.Start
+F.Intrinsic.Control.Try
+
+F.ODBC.Connection!con.Close
+F.Intrinsic.Control.End
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(ErrorMessage, "ErrorNumber", V.Ambient.ErrorNumber, "ErrorDescription", V.Ambient.ErrorDescription, "Subroutine", V.Ambient.CurrentSubroutine, "Callback", "FMobileJ52Maint_Unload")
+F.Intrinsic.Control.EndTry
+Program.Sub.FMobileJ52Maint_Unload.End
+Program.Sub.cmdBinBrowserJ52_Click.Start
+F.Intrinsic.Control.Try
+
+V.Local.sError.Declare(String)
+V.Local.sSql.Declare(String)
+V.local.sTitles.Declare(String)
+V.Local.iWidths.Declare(Long)
+V.Local.iOpt.Declare(Long)
+V.Local.sRet.Declare(String)
+
+'create browser
+V.Local.sSql.Set("select BIN, LOCATION, BIN_DESCRIPTION AS DESCRIPTION FROM V_BIN_MASTER")
+F.Intrinsic.String.Split("BIN*!*LOCATION*!*DESCRIPTION","*!*",V.Local.sTitles)
+F.Intrinsic.String.Split("300*!*300*!*600","*!*",V.Local.iWidths)
+F.Intrinsic.UI.Browser("Select Bin","CON",V.Local.sSql,V.Local.sTitles,V.Local.iWidths,V.Local.sRet)
+
+'handle return
+F.Intrinsic.Control.If(V.Local.sRet,=,"***CANCEL***")
+	F.Intrinsic.UI.Msgbox("No Bin Selected")
+F.Intrinsic.Control.else
+	F.Intrinsic.String.Split(V.Local.sRet,"*!*",V.local.sRet)
+	gui.FMobileJ52Maint.txtToBinJ52.Text(V.Local.sRet(0))
+	gui.FMobileJ52Maint.chkDefaultBin.Value(0)
+	gui.FMobileJ52Maint.chkStockingBin.Value(0)
+	gui.FMobileJ52Maint.ddlBinfld.Text("")
+	'gui.FMobileJ52Maint.ddlBinfld.Enabled("False")
+F.Intrinsic.Control.EndIf
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(ErrorMessage, "ErrorNumber", V.Ambient.ErrorNumber, "ErrorDescription", V.Ambient.ErrorDescription, "Subroutine", V.Ambient.CurrentSubroutine, "Callback", "FMobileJ52Maint_Unload")
+F.Intrinsic.Control.EndTry
+Program.Sub.cmdBinBrowserJ52_Click.End
+Program.Sub.cmdPrinterBrowserJ52_Click.Start
+F.Intrinsic.Control.Try
+
+V.Local.sError.Declare(String)
+V.Local.sSql.Declare(String)
+V.local.sTitles.Declare(String)
+V.Local.iWidths.Declare(Long)
+V.Local.iOpt.Declare(Long)
+V.Local.sRet.Declare(String)
+
+F.ODBC.Connection!comm.openconnection(V.Ambient.Ccon,V.Ambient.Cuser,V.Ambient.Cpass)
+
+'create browser
+V.Local.sSql.Set("select PRINTERNAME AS PRINTER, SENTINELALIAS AS ALIAS from SERVER_PRINTERS where SENTINELALIAS > ''")
+F.Intrinsic.String.Split("PRINTER*!*ALIAS","*!*",V.Local.sTitles)
+F.Intrinsic.String.Split("600*!*600","*!*",V.Local.iWidths)
+F.Intrinsic.UI.Browser("Select Printer","COMM",V.Local.sSql,V.Local.sTitles,V.Local.iWidths,V.Local.sRet)
+
+'handle return
+F.Intrinsic.Control.If(V.Local.sRet,=,"***CANCEL***")
+	F.Intrinsic.UI.Msgbox("No Printer Selected")
+F.Intrinsic.Control.else
+	F.Intrinsic.String.Split(V.Local.sRet,"*!*",V.local.sRet)
+	gui.FMobileJ52Maint.txtPrinterJ52.Text(V.Local.sRet(1))
+F.Intrinsic.Control.EndIf
+
+F.ODBC.Connection!comm.Close
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(ErrorMessage, "ErrorNumber", V.Ambient.ErrorNumber, "ErrorDescription", V.Ambient.ErrorDescription, "Subroutine", V.Ambient.CurrentSubroutine, "Callback", "FMobileJ52Maint_Unload")
+F.Intrinsic.Control.EndTry
+Program.Sub.cmdPrinterBrowserJ52_Click.End
+Program.Sub.chkNotifyJ52_Click.Start
+F.Intrinsic.Control.Try
+
+gui.FMobileJ52Maint.cmdSave.Enabled(True)
+gui.FMobileJ52Maint.cmdRefresh.Enabled(True)
+
+'gui.FMobileJ52Maint.txtNotifyJ52.Enabled(V.Screen.FMobileJ52Maint!chkNotifyJ52.CheckedAsBoolean)
+'gui.FMobileJ52Maint.txtSenderJ52.Enabled(V.Screen.FMobileJ52Maint!chkNotifyJ52.CheckedAsBoolean)
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(ErrorMessage, "ErrorNumber", V.Ambient.ErrorNumber, "ErrorDescription", V.Ambient.ErrorDescription, "Subroutine", V.Ambient.CurrentSubroutine, "Callback", "FMobileJ52Maint_Unload")
+F.Intrinsic.Control.EndTry
+Program.Sub.chkNotifyJ52_Click.End
+Program.Sub.CheckPrinterClicked.Start
+F.Intrinsic.Control.Try
+
+V.Local.sControl.Declare(String)
+
+gui.FMobileJ52Maint.cmdSave.Enabled(True)
+gui.FMobileJ52Maint.cmdRefresh.Enabled(True)
+
+F.Intrinsic.String.Replace(V.Args.CONTROLNAME, "chkPrint", "txtPrinter", V.Local.sControl)
+gui.FMobileJ52Maint.[V.Local.sControl].Enabled(V.Screen.FMobileJ52Maint![V.Args.CONTROLNAME].CheckedAsBoolean)
+F.Intrinsic.String.Replace(V.Local.sControl, "txtPrinter", "cmdPrinterBrowser", V.Local.sControl)
+gui.FMobileJ52Maint.[V.Local.sControl].Enabled(V.Screen.FMobileJ52Maint![V.Args.CONTROLNAME].CheckedAsBoolean)
+F.Intrinsic.String.Replace(V.Local.sControl, "cmdPrinterBrowser", "txtcopies", V.Local.sControl)
+gui.FMobileJ52Maint.[V.Local.sControl].Enabled(V.Screen.FMobileJ52Maint![V.Args.CONTROLNAME].CheckedAsBoolean)
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(ErrorMessage, "ErrorNumber", V.Ambient.ErrorNumber, "ErrorDescription", V.Ambient.ErrorDescription, "Subroutine", V.Ambient.CurrentSubroutine, "Callback", "FMobileJ52Maint_Unload")
+F.Intrinsic.Control.EndTry
+Program.Sub.CheckPrinterClicked.End
+Program.Sub.ChangesMade.Start
+F.Intrinsic.Control.Try
+f.Intrinsic.Control.If(V.Screen.FMobileJ52Maint!ddlCloseJ52.Text.Trim,=,"Always Close")
+	gui.FMobileJ52Maint.ddlmanualclose.Text("N/A")
+	gui.FMobileJ52Maint.ddlmanualclose.Enabled(false)
+f.Intrinsic.Control.Else
+	gui.FMobileJ52Maint.ddlmanualclose.Enabled(true)
+f.Intrinsic.Control.EndIf
+gui.FMobileJ52Maint.cmdSave.Enabled(True)
+gui.FMobileJ52Maint.cmdRefresh.Enabled(True)
+V.Global.bSave.Set(True)
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(ErrorMessage, "ErrorNumber", V.Ambient.ErrorNumber, "ErrorDescription", V.Ambient.ErrorDescription, "Subroutine", V.Ambient.CurrentSubroutine, "Callback", "FMobileJ52Maint_Unload")
+F.Intrinsic.Control.EndTry
+Program.Sub.ChangesMade.End
+Program.Sub.CheckEmail.Start
+F.Intrinsic.Control.Try
+
+V.Local.sControl.Declare(String)
+V.Local.bCheck.Declare(Boolean)
+
+F.Intrinsic.Control.If(V.Screen.FMobileJ52Maint![V.Args.CONTROLNAME].Text.Trim, =, "")
+	F.Intrinsic.Control.ExitSub
+F.Intrinsic.Control.EndIf
+
+F.Global.Messaging.IsAddressValid(V.Screen.FMobileJ52Maint![V.Args.CONTROLNAME].Text.Trim, V.Local.bCheck)
+
+F.Intrinsic.String.Replace(V.Args.CONTROLNAME, "txt", "lblWarning", V.Local.sControl)
+gui.FMobileJ52Maint.[V.Local.sControl].Visible(V.Local.bCheck.Not)
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(ErrorMessage, "ErrorNumber", V.Ambient.ErrorNumber, "ErrorDescription", V.Ambient.ErrorDescription, "Subroutine", V.Ambient.CurrentSubroutine, "Callback", "FMobileJ52Maint_Unload")
+F.Intrinsic.Control.EndTry
+Program.Sub.CheckEmail.End
+Program.Sub.HideWarnings.Start
+F.Intrinsic.Control.Try
+
+gui.FMobileJ52Maint.lblWarningNotifyJ52.Visible(False)
+gui.FMobileJ52Maint.lblWarningSenderJ52.Visible(False)
+gui.FMobileJ52Maint.lblJ52W.Visible(False)
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(ErrorMessage, "ErrorNumber", V.Ambient.ErrorNumber, "ErrorDescription", V.Ambient.ErrorDescription, "Subroutine", V.Ambient.CurrentSubroutine, "Callback", "FMobileJ52Maint_Unload")
+F.Intrinsic.Control.EndTry
+Program.Sub.HideWarnings.End
+Program.Sub.cmdRefresh_Click.Start
+F.Intrinsic.Control.Try
+
+V.Local.iRet.Declare(Long)
+
+gui.FMobileJ52Maint..Enabled(False)
+F.Intrinsic.UI.Msgbox("Refreshing the Options will clear any unsaved data and reload the data from the database. Do you wish to continue?","Refresh Options?",4,V.Local.iret)
+F.Intrinsic.Control.If(V.Local.iRet,=,7)
+	gui.FMobileJ52Maint..Enabled(True)
+	F.Intrinsic.Control.ExitSub
+F.Intrinsic.Control.EndIf
+
+F.Intrinsic.Control.CallSub(ClearOptions)
+F.Intrinsic.Control.CallSub(LoadData)
+gui.FMobileJ52Maint.frameParent.Enabled(True)
+gui.FMobileJ52Maint.cmdSave.Enabled(False)
+
+
+gui.FMobileJ52Maint..Enabled(True)
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(ErrorMessage, "ErrorNumber", V.Ambient.ErrorNumber, "ErrorDescription", V.Ambient.ErrorDescription, "Subroutine", V.Ambient.CurrentSubroutine, "Callback", "FMobileJ52Maint_Unload")
+F.Intrinsic.Control.EndTry
+Program.Sub.cmdRefresh_Click.End
+Program.Sub.ClearHeader.Start
+F.Intrinsic.Control.Try
+
+V.Global.sAntenna.Set("")
+V.Global.sReader.Set("")
+
+gui.FMobileJ52Maint.txtAntName.Text("")
+gui.FMobileJ52Maint.txtReader.Text("")
+gui.FMobileJ52Maint.cmdSave.Enabled(False)
+gui.FMobileJ52Maint.cmdRefresh.Enabled(False)
+gui.FMobileJ52Maint.frameParent.Enabled(False)
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(ErrorMessage, "ErrorNumber", V.Ambient.ErrorNumber, "ErrorDescription", V.Ambient.ErrorDescription, "Subroutine", V.Ambient.CurrentSubroutine, "Callback", "FMobileJ52Maint_Unload")
+F.Intrinsic.Control.EndTry
+Program.Sub.ClearHeader.End
+Program.Sub.ClearOptions.Start
+F.Intrinsic.Control.Try
+
+gui.FMobileJ52Maint.chkJ52.Value(0)
+gui.FMobileJ52Maint.txtToBinJ52.Text("")
+gui.FMobileJ52Maint.chkPrintJ52.Value(0)
+gui.FMobileJ52Maint.txtPrinterJ52.Text("")
+'gui.FMobileJ52Maint.chkNotifyJ52.Value(0)
+'gui.FMobileJ52Maint.txtNotifyJ52.Text("")
+'gui.FMobileJ52Maint.txtSenderJ52.Text("")
+gui.FMobileJ52Maint.chkDefaultBin.Value(False)
+gui.FMobileJ52Maint.chkStockingBin.Value(False)
+gui.FMobileJ52Maint.frameJ52.Enabled(False)
+gui.FMobileJ52Maint.txtcopiesJ52.Text("")
+gui.FMobileJ52Maint.ddlWOfld.Text("Field_1")
+gui.FMobileJ52Maint.ddlQtyfld.Text("Field_2")
+gui.FMobileJ52Maint.ddlLotfld.Text("N/A")
+gui.FMobileJ52Maint.ddlBinfld.Text("N/A")
+gui.FMobileJ52Maint.ddlHeatfld.Text("N/A")
+gui.FMobileJ52Maint.ddlSerialfld.Text("N/A")
+gui.FMobileJ52Maint.ddlUser1fld.Text("N/A")
+gui.FMobileJ52Maint.ddlUser2fld.Text("N/A")
+gui.FMobileJ52Maint.ddlUser3fld.Text("N/A")
+gui.FMobileJ52Maint.ddlUser4fld.Text("N/A")
+gui.FMobileJ52Maint.ddlUser5fld.Text("N/A")
+gui.FMobileJ52Maint.ddlUser6fld.Text("N/A")
+gui.FMobileJ52Maint.ddlUser7fld.Text("N/A")
+gui.FMobileJ52Maint.ddlUser8fld.Text("N/A")
+gui.FMobileJ52Maint.ddlUser9fld.Text("N/A")
+gui.FMobileJ52Maint.ddlmanualclose.Text("N/A")
+
+gui.FMobileJ52Maint.cmdRefresh.Enabled(True)
+'F.Intrinsic.Control.CallSub(HideWarnings)
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(ErrorMessage, "ErrorNumber", V.Ambient.ErrorNumber, "ErrorDescription", V.Ambient.ErrorDescription, "Subroutine", V.Ambient.CurrentSubroutine, "Callback", "FMobileJ52Maint_Unload")
+F.Intrinsic.Control.EndTry
+Program.Sub.ClearOptions.End
+
+Program.Sub.SetIcon.Start
+F.Intrinsic.Control.Try
+
+V.Local.sForm.Declare(String)
+V.Local.bExists.Declare(Boolean)
+V.Local.sIcon.Declare(String)
+V.Local.iCounter.Declare(Long)
+
+F.Intrinsic.String.Build("{0}\ART\gss2.ico",V.Caller.GlobalDir,V.Local.sIcon)
+F.Intrinsic.File.Exists(V.Local.sIcon, V.Local.bExists)
+F.Intrinsic.Control.If(V.Local.bExists.Not)
+	F.Intrinsic.String.Build("{0}\GAB\GAS\gss2.ico",V.Caller.PluginsDir,V.Local.sIcon)
+	F.Intrinsic.File.Exists(V.Local.sIcon, V.Local.bExists)
+	F.Intrinsic.Control.If(V.Local.bExists.Not)
+		F.Intrinsic.Control.ExitSub
+	F.Intrinsic.Control.EndIf
+F.Intrinsic.Control.EndIf
+
+F.Intrinsic.UI.GetFormList(V.Local.sForm)
+F.Intrinsic.String.Split(V.Local.sForm, "*!*", V.Local.sForm)
+
+F.Intrinsic.Control.For(V.Local.iCounter, 0, V.Local.sForm.UBound, 1)
+	GUI.[V.Local.sForm(V.Local.iCounter)]..Icon(V.Local.sIcon)
+F.Intrinsic.Control.Next(V.Local.iCounter)
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(ErrorMessage, "ErrorNumber", V.Ambient.ErrorNumber, "ErrorDescription", V.Ambient.ErrorDescription, "Subroutine", V.Ambient.CurrentSubroutine, "Callback", "FMobileJ52Maint_Unload")
+F.Intrinsic.Control.EndTry
+Program.Sub.SetIcon.End
+Program.Sub.ToggleTransactionEnabled.Start
+F.Intrinsic.Control.Try
+
+V.Local.sFrame.Declare(String)
+
+gui.FMobileJ52Maint.cmdSave.Enabled(True)
+gui.FMobileJ52Maint.cmdRefresh.Enabled(True)
+
+'get frame name
+F.Intrinsic.String.Replace(V.Args.ControlName, "chk", "frame", V.Local.sFrame)
+gui.FMobileJ52Maint.[V.Local.sFrame].Enabled(V.Screen.FMobileJ52Maint![V.Args.ControlName].CheckedAsBoolean)
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(ErrorMessage, "ErrorNumber", V.Ambient.ErrorNumber, "ErrorDescription", V.Ambient.ErrorDescription, "Subroutine", V.Ambient.CurrentSubroutine, "Callback", "FMobileJ52Maint_Unload")
+F.Intrinsic.Control.EndTry
+Program.Sub.ToggleTransactionEnabled.End
+Program.Sub.ErrorMessage.Start
+'basic error message for replacing catch block
+'this is really just for when printing the message and ending program
+'pass error number, error description, current subroutine
+'optional callback sub, this will be called before ending
+'optional unattended parameters, those subs may not exist if not using them but won't be called
+F.Intrinsic.Control.Try
+
+V.Local.iError.Declare(Long)
+V.Local.sErrorDescription.Declare(String)
+V.Local.sSubroutine.Declare(String)
+V.Local.sError.Declare(String)
+V.Local.bExists.Declare(Boolean)
+V.Local.sCallback.Declare(String)
+
+V.Local.iError.Set(V.Args.ErrorNumber)
+V.Local.sErrorDescription.Set(V.Args.ErrorDescription)
+V.Local.sSubroutine.Set(V.Args.Subroutine)
+
+'make sure we aren't in an error loop
+F.Intrinsic.Control.If(V.Global.bError)
+	F.Intrinsic.Control.End
+F.Intrinsic.Control.EndIf
+V.Global.bError.Set(True)
+
+F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}", V.Caller.ScriptFile, V.Ambient.Newline, V.Local.sSubroutine, V.Local.iError, V.Local.sErrorDescription, V.Ambient.GABVersion, V.Local.sError)
+
+F.Intrinsic.Variable.ArgExists("UNATTENDED", V.Local.bExists)
+F.Intrinsic.Control.If(V.Local.bExists)
+	F.Intrinsic.Control.If(V.Args.UNATTENDED)
+		F.Intrinsic.Control.CallSub(UnattendedErrorMessage, "MESSAGE", V.Local.sError, "PROJECT", V.Args.PROJECT, "PROJECTTITLE", V.Args.PROJECTTITLE)
+	F.Intrinsic.Control.Else
+		F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.EndIf
+F.Intrinsic.Control.Else
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+F.Intrinsic.Control.EndIf
+
+F.Intrinsic.Variable.ArgExists("Callback", V.Local.bExists)
+F.Intrinsic.Control.If(V.Local.bExists)
+	V.Local.sCallback.Set(V.Args.Callback.Trim)
+	F.Intrinsic.Control.CallSub(V.Local.sCallback)
+F.Intrinsic.Control.EndIf
+
+F.Intrinsic.Control.End
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",V.Caller.ScriptFile,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.End
+F.Intrinsic.Control.EndTry
+Program.Sub.ErrorMessage.End
+Program.Sub.LoadCloseDropDown.Start
+F.Intrinsic.Control.Try
+
+gui.FMobileJ52Maint.ddlCloseJ52.AddItem("Always Close")
+gui.FMobileJ52Maint.ddlCloseJ52.AddItem("When Run Quantity is Completed")
+gui.FMobileJ52Maint.ddlCloseJ52.AddItem("Do Not Close")
+gui.FMobileJ52Maint.ddlCloseJ52.ListIndex(0)
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(ErrorMessage, "ErrorNumber", V.Ambient.ErrorNumber, "ErrorDescription", V.Ambient.ErrorDescription, "Subroutine", V.Ambient.CurrentSubroutine, "Callback", "FMobileJ52Maint_Unload")
+F.Intrinsic.Control.EndTry
+Program.Sub.LoadCloseDropDown.End
+Program.Sub.LoadFieldList.Start
+F.Intrinsic.Control.Try
+gui.FMobileJ52Maint.ddlWOfld.AddItem("N/A")
+gui.FMobileJ52Maint.ddlWOfld.AddItem("Field_1")
+gui.FMobileJ52Maint.ddlWOfld.AddItem("Field_2")
+gui.FMobileJ52Maint.ddlWOfld.AddItem("Field_3")
+gui.FMobileJ52Maint.ddlWOfld.AddItem("Field_4")
+gui.FMobileJ52Maint.ddlWOfld.AddItem("Field_5")
+gui.FMobileJ52Maint.ddlWOfld.AddItem("Field_6")
+gui.FMobileJ52Maint.ddlWOfld.AddItem("Field_7")
+gui.FMobileJ52Maint.ddlWOfld.AddItem("Field_8")
+gui.FMobileJ52Maint.ddlWOfld.AddItem("Field_9")
+gui.FMobileJ52Maint.ddlWOfld.AddItem("Field_10")
+gui.FMobileJ52Maint.ddlWOfld.AddItem("Field_11")
+gui.FMobileJ52Maint.ddlWOfld.AddItem("Field_12")
+gui.FMobileJ52Maint.ddlWOfld.AddItem("Field_13")
+gui.FMobileJ52Maint.ddlWOfld.AddItem("Field_14")
+gui.FMobileJ52Maint.ddlWOfld.AddItem("Field_15")
+gui.FMobileJ52Maint.ddlWOfld.ListIndex(1)
+
+gui.FMobileJ52Maint.ddlQtyfld.AddItem("N/A")
+gui.FMobileJ52Maint.ddlQtyfld.AddItem("Field_1")
+gui.FMobileJ52Maint.ddlQtyfld.AddItem("Field_2")
+gui.FMobileJ52Maint.ddlQtyfld.AddItem("Field_3")
+gui.FMobileJ52Maint.ddlQtyfld.AddItem("Field_4")
+gui.FMobileJ52Maint.ddlQtyfld.AddItem("Field_5")
+gui.FMobileJ52Maint.ddlQtyfld.AddItem("Field_6")
+gui.FMobileJ52Maint.ddlQtyfld.AddItem("Field_7")
+gui.FMobileJ52Maint.ddlQtyfld.AddItem("Field_8")
+gui.FMobileJ52Maint.ddlQtyfld.AddItem("Field_9")
+gui.FMobileJ52Maint.ddlQtyfld.AddItem("Field_10")
+gui.FMobileJ52Maint.ddlQtyfld.AddItem("Field_11")
+gui.FMobileJ52Maint.ddlQtyfld.AddItem("Field_12")
+gui.FMobileJ52Maint.ddlQtyfld.AddItem("Field_13")
+gui.FMobileJ52Maint.ddlQtyfld.AddItem("Field_14")
+gui.FMobileJ52Maint.ddlQtyfld.AddItem("Field_15")
+gui.FMobileJ52Maint.ddlQtyfld.ListIndex(2)
+
+gui.FMobileJ52Maint.ddlLotfld.AddItem("N/A")
+gui.FMobileJ52Maint.ddlLotfld.AddItem("Calc-MIN")
+gui.FMobileJ52Maint.ddlLotfld.AddItem("Calc-HIH")
+gui.FMobileJ52Maint.ddlLotfld.AddItem("Field_1")
+gui.FMobileJ52Maint.ddlLotfld.AddItem("Field_2")
+gui.FMobileJ52Maint.ddlLotfld.AddItem("Field_3")
+gui.FMobileJ52Maint.ddlLotfld.AddItem("Field_4")
+gui.FMobileJ52Maint.ddlLotfld.AddItem("Field_5")
+gui.FMobileJ52Maint.ddlLotfld.AddItem("Field_6")
+gui.FMobileJ52Maint.ddlLotfld.AddItem("Field_7")
+gui.FMobileJ52Maint.ddlLotfld.AddItem("Field_8")
+gui.FMobileJ52Maint.ddlLotfld.AddItem("Field_9")
+gui.FMobileJ52Maint.ddlLotfld.AddItem("Field_10")
+gui.FMobileJ52Maint.ddlLotfld.AddItem("Field_11")
+gui.FMobileJ52Maint.ddlLotfld.AddItem("Field_12")
+gui.FMobileJ52Maint.ddlLotfld.AddItem("Field_13")
+gui.FMobileJ52Maint.ddlLotfld.AddItem("Field_14")
+gui.FMobileJ52Maint.ddlLotfld.AddItem("Field_15")
+gui.FMobileJ52Maint.ddlLotfld.ListIndex(0)
+
+gui.FMobileJ52Maint.ddlBinfld.AddItem("N/A")
+gui.FMobileJ52Maint.ddlBinfld.AddItem("Field_1")
+gui.FMobileJ52Maint.ddlBinfld.AddItem("Field_2")
+gui.FMobileJ52Maint.ddlBinfld.AddItem("Field_3")
+gui.FMobileJ52Maint.ddlBinfld.AddItem("Field_4")
+gui.FMobileJ52Maint.ddlBinfld.AddItem("Field_5")
+gui.FMobileJ52Maint.ddlBinfld.AddItem("Field_6")
+gui.FMobileJ52Maint.ddlBinfld.AddItem("Field_7")
+gui.FMobileJ52Maint.ddlBinfld.AddItem("Field_8")
+gui.FMobileJ52Maint.ddlBinfld.AddItem("Field_9")
+gui.FMobileJ52Maint.ddlBinfld.AddItem("Field_10")
+gui.FMobileJ52Maint.ddlBinfld.AddItem("Field_11")
+gui.FMobileJ52Maint.ddlBinfld.AddItem("Field_12")
+gui.FMobileJ52Maint.ddlBinfld.AddItem("Field_13")
+gui.FMobileJ52Maint.ddlBinfld.AddItem("Field_14")
+gui.FMobileJ52Maint.ddlBinfld.AddItem("Field_15")
+gui.FMobileJ52Maint.ddlBinfld.ListIndex(0)
+
+gui.FMobileJ52Maint.ddlHeatfld.AddItem("N/A")
+gui.FMobileJ52Maint.ddlHeatfld.AddItem("Calc-MIN")
+gui.FMobileJ52Maint.ddlHeatfld.AddItem("Field_1")
+gui.FMobileJ52Maint.ddlHeatfld.AddItem("Field_2")
+gui.FMobileJ52Maint.ddlHeatfld.AddItem("Field_3")
+gui.FMobileJ52Maint.ddlHeatfld.AddItem("Field_4")
+gui.FMobileJ52Maint.ddlHeatfld.AddItem("Field_5")
+gui.FMobileJ52Maint.ddlHeatfld.AddItem("Field_6")
+gui.FMobileJ52Maint.ddlHeatfld.AddItem("Field_7")
+gui.FMobileJ52Maint.ddlHeatfld.AddItem("Field_8")
+gui.FMobileJ52Maint.ddlHeatfld.AddItem("Field_9")
+gui.FMobileJ52Maint.ddlHeatfld.AddItem("Field_10")
+gui.FMobileJ52Maint.ddlHeatfld.AddItem("Field_11")
+gui.FMobileJ52Maint.ddlHeatfld.AddItem("Field_12")
+gui.FMobileJ52Maint.ddlHeatfld.AddItem("Field_13")
+gui.FMobileJ52Maint.ddlHeatfld.AddItem("Field_14")
+gui.FMobileJ52Maint.ddlHeatfld.AddItem("Field_15")
+gui.FMobileJ52Maint.ddlHeatfld.ListIndex(0)
+
+gui.FMobileJ52Maint.ddlSerialfld.AddItem("N/A")
+gui.FMobileJ52Maint.ddlSerialfld.AddItem("Field_1")
+gui.FMobileJ52Maint.ddlSerialfld.AddItem("Field_2")
+gui.FMobileJ52Maint.ddlSerialfld.AddItem("Field_3")
+gui.FMobileJ52Maint.ddlSerialfld.AddItem("Field_4")
+gui.FMobileJ52Maint.ddlSerialfld.AddItem("Field_5")
+gui.FMobileJ52Maint.ddlSerialfld.AddItem("Field_6")
+gui.FMobileJ52Maint.ddlSerialfld.AddItem("Field_7")
+gui.FMobileJ52Maint.ddlSerialfld.AddItem("Field_8")
+gui.FMobileJ52Maint.ddlSerialfld.AddItem("Field_9")
+gui.FMobileJ52Maint.ddlSerialfld.AddItem("Field_10")
+gui.FMobileJ52Maint.ddlSerialfld.AddItem("Field_11")
+gui.FMobileJ52Maint.ddlSerialfld.AddItem("Field_12")
+gui.FMobileJ52Maint.ddlSerialfld.AddItem("Field_13")
+gui.FMobileJ52Maint.ddlSerialfld.AddItem("Field_14")
+gui.FMobileJ52Maint.ddlSerialfld.AddItem("Field_15")
+gui.FMobileJ52Maint.ddlSerialfld.ListIndex(0)
+
+gui.FMobileJ52Maint.ddlUser1fld.AddItem("N/A")
+gui.FMobileJ52Maint.ddlUser1fld.AddItem("Field_1")
+gui.FMobileJ52Maint.ddlUser1fld.AddItem("Field_2")
+gui.FMobileJ52Maint.ddlUser1fld.AddItem("Field_3")
+gui.FMobileJ52Maint.ddlUser1fld.AddItem("Field_4")
+gui.FMobileJ52Maint.ddlUser1fld.AddItem("Field_5")
+gui.FMobileJ52Maint.ddlUser1fld.AddItem("Field_6")
+gui.FMobileJ52Maint.ddlUser1fld.AddItem("Field_7")
+gui.FMobileJ52Maint.ddlUser1fld.AddItem("Field_8")
+gui.FMobileJ52Maint.ddlUser1fld.AddItem("Field_9")
+gui.FMobileJ52Maint.ddlUser1fld.AddItem("Field_10")
+gui.FMobileJ52Maint.ddlUser1fld.AddItem("Field_11")
+gui.FMobileJ52Maint.ddlUser1fld.AddItem("Field_12")
+gui.FMobileJ52Maint.ddlUser1fld.AddItem("Field_13")
+gui.FMobileJ52Maint.ddlUser1fld.AddItem("Field_14")
+gui.FMobileJ52Maint.ddlUser1fld.AddItem("Field_15")
+gui.FMobileJ52Maint.ddlUser1fld.ListIndex(0)
+
+gui.FMobileJ52Maint.ddlUser2fld.AddItem("N/A")
+gui.FMobileJ52Maint.ddlUser2fld.AddItem("Field_1")
+gui.FMobileJ52Maint.ddlUser2fld.AddItem("Field_2")
+gui.FMobileJ52Maint.ddlUser2fld.AddItem("Field_3")
+gui.FMobileJ52Maint.ddlUser2fld.AddItem("Field_4")
+gui.FMobileJ52Maint.ddlUser2fld.AddItem("Field_5")
+gui.FMobileJ52Maint.ddlUser2fld.AddItem("Field_6")
+gui.FMobileJ52Maint.ddlUser2fld.AddItem("Field_7")
+gui.FMobileJ52Maint.ddlUser2fld.AddItem("Field_8")
+gui.FMobileJ52Maint.ddlUser2fld.AddItem("Field_9")
+gui.FMobileJ52Maint.ddlUser2fld.AddItem("Field_10")
+gui.FMobileJ52Maint.ddlUser2fld.AddItem("Field_11")
+gui.FMobileJ52Maint.ddlUser2fld.AddItem("Field_12")
+gui.FMobileJ52Maint.ddlUser2fld.AddItem("Field_13")
+gui.FMobileJ52Maint.ddlUser2fld.AddItem("Field_14")
+gui.FMobileJ52Maint.ddlUser2fld.AddItem("Field_15")
+gui.FMobileJ52Maint.ddlUser2fld.ListIndex(0)
+
+gui.FMobileJ52Maint.ddlUser3fld.AddItem("N/A")
+gui.FMobileJ52Maint.ddlUser3fld.AddItem("Field_1")
+gui.FMobileJ52Maint.ddlUser3fld.AddItem("Field_2")
+gui.FMobileJ52Maint.ddlUser3fld.AddItem("Field_3")
+gui.FMobileJ52Maint.ddlUser3fld.AddItem("Field_4")
+gui.FMobileJ52Maint.ddlUser3fld.AddItem("Field_5")
+gui.FMobileJ52Maint.ddlUser3fld.AddItem("Field_6")
+gui.FMobileJ52Maint.ddlUser3fld.AddItem("Field_7")
+gui.FMobileJ52Maint.ddlUser3fld.AddItem("Field_8")
+gui.FMobileJ52Maint.ddlUser3fld.AddItem("Field_9")
+gui.FMobileJ52Maint.ddlUser3fld.AddItem("Field_10")
+gui.FMobileJ52Maint.ddlUser3fld.AddItem("Field_11")
+gui.FMobileJ52Maint.ddlUser3fld.AddItem("Field_12")
+gui.FMobileJ52Maint.ddlUser3fld.AddItem("Field_13")
+gui.FMobileJ52Maint.ddlUser3fld.AddItem("Field_14")
+gui.FMobileJ52Maint.ddlUser3fld.AddItem("Field_15")
+gui.FMobileJ52Maint.ddlUser3fld.ListIndex(0)
+
+gui.FMobileJ52Maint.ddlUser4fld.AddItem("N/A")
+gui.FMobileJ52Maint.ddlUser4fld.AddItem("Field_1")
+gui.FMobileJ52Maint.ddlUser4fld.AddItem("Field_2")
+gui.FMobileJ52Maint.ddlUser4fld.AddItem("Field_3")
+gui.FMobileJ52Maint.ddlUser4fld.AddItem("Field_4")
+gui.FMobileJ52Maint.ddlUser4fld.AddItem("Field_5")
+gui.FMobileJ52Maint.ddlUser4fld.AddItem("Field_6")
+gui.FMobileJ52Maint.ddlUser4fld.AddItem("Field_7")
+gui.FMobileJ52Maint.ddlUser4fld.AddItem("Field_8")
+gui.FMobileJ52Maint.ddlUser4fld.AddItem("Field_9")
+gui.FMobileJ52Maint.ddlUser4fld.AddItem("Field_10")
+gui.FMobileJ52Maint.ddlUser4fld.AddItem("Field_11")
+gui.FMobileJ52Maint.ddlUser4fld.AddItem("Field_12")
+gui.FMobileJ52Maint.ddlUser4fld.AddItem("Field_13")
+gui.FMobileJ52Maint.ddlUser4fld.AddItem("Field_14")
+gui.FMobileJ52Maint.ddlUser4fld.AddItem("Field_15")
+gui.FMobileJ52Maint.ddlUser4fld.ListIndex(0)
+
+gui.FMobileJ52Maint.ddlUser5fld.AddItem("N/A")
+gui.FMobileJ52Maint.ddlUser5fld.AddItem("Field_1")
+gui.FMobileJ52Maint.ddlUser5fld.AddItem("Field_2")
+gui.FMobileJ52Maint.ddlUser5fld.AddItem("Field_3")
+gui.FMobileJ52Maint.ddlUser5fld.AddItem("Field_4")
+gui.FMobileJ52Maint.ddlUser5fld.AddItem("Field_5")
+gui.FMobileJ52Maint.ddlUser5fld.AddItem("Field_6")
+gui.FMobileJ52Maint.ddlUser5fld.AddItem("Field_7")
+gui.FMobileJ52Maint.ddlUser5fld.AddItem("Field_8")
+gui.FMobileJ52Maint.ddlUser5fld.AddItem("Field_9")
+gui.FMobileJ52Maint.ddlUser5fld.AddItem("Field_10")
+gui.FMobileJ52Maint.ddlUser5fld.AddItem("Field_11")
+gui.FMobileJ52Maint.ddlUser5fld.AddItem("Field_12")
+gui.FMobileJ52Maint.ddlUser5fld.AddItem("Field_13")
+gui.FMobileJ52Maint.ddlUser5fld.AddItem("Field_14")
+gui.FMobileJ52Maint.ddlUser5fld.AddItem("Field_15")
+gui.FMobileJ52Maint.ddlUser5fld.ListIndex(0)
+
+gui.FMobileJ52Maint.ddlUser6fld.AddItem("N/A")
+gui.FMobileJ52Maint.ddlUser6fld.AddItem("Field_1")
+gui.FMobileJ52Maint.ddlUser6fld.AddItem("Field_2")
+gui.FMobileJ52Maint.ddlUser6fld.AddItem("Field_3")
+gui.FMobileJ52Maint.ddlUser6fld.AddItem("Field_4")
+gui.FMobileJ52Maint.ddlUser6fld.AddItem("Field_5")
+gui.FMobileJ52Maint.ddlUser6fld.AddItem("Field_6")
+gui.FMobileJ52Maint.ddlUser6fld.AddItem("Field_7")
+gui.FMobileJ52Maint.ddlUser6fld.AddItem("Field_8")
+gui.FMobileJ52Maint.ddlUser6fld.AddItem("Field_9")
+gui.FMobileJ52Maint.ddlUser6fld.AddItem("Field_10")
+gui.FMobileJ52Maint.ddlUser6fld.AddItem("Field_11")
+gui.FMobileJ52Maint.ddlUser6fld.AddItem("Field_12")
+gui.FMobileJ52Maint.ddlUser6fld.AddItem("Field_13")
+gui.FMobileJ52Maint.ddlUser6fld.AddItem("Field_14")
+gui.FMobileJ52Maint.ddlUser6fld.AddItem("Field_15")
+gui.FMobileJ52Maint.ddlUser6fld.ListIndex(0)
+
+gui.FMobileJ52Maint.ddlUser7fld.AddItem("N/A")
+gui.FMobileJ52Maint.ddlUser7fld.AddItem("Field_1")
+gui.FMobileJ52Maint.ddlUser7fld.AddItem("Field_2")
+gui.FMobileJ52Maint.ddlUser7fld.AddItem("Field_3")
+gui.FMobileJ52Maint.ddlUser7fld.AddItem("Field_4")
+gui.FMobileJ52Maint.ddlUser7fld.AddItem("Field_5")
+gui.FMobileJ52Maint.ddlUser7fld.AddItem("Field_6")
+gui.FMobileJ52Maint.ddlUser7fld.AddItem("Field_7")
+gui.FMobileJ52Maint.ddlUser7fld.AddItem("Field_8")
+gui.FMobileJ52Maint.ddlUser7fld.AddItem("Field_9")
+gui.FMobileJ52Maint.ddlUser7fld.AddItem("Field_10")
+gui.FMobileJ52Maint.ddlUser7fld.AddItem("Field_11")
+gui.FMobileJ52Maint.ddlUser7fld.AddItem("Field_12")
+gui.FMobileJ52Maint.ddlUser7fld.AddItem("Field_13")
+gui.FMobileJ52Maint.ddlUser7fld.AddItem("Field_14")
+gui.FMobileJ52Maint.ddlUser7fld.AddItem("Field_15")
+gui.FMobileJ52Maint.ddlUser7fld.ListIndex(0)
+
+gui.FMobileJ52Maint.ddlUser8fld.AddItem("N/A")
+gui.FMobileJ52Maint.ddlUser8fld.AddItem("Field_1")
+gui.FMobileJ52Maint.ddlUser8fld.AddItem("Field_2")
+gui.FMobileJ52Maint.ddlUser8fld.AddItem("Field_3")
+gui.FMobileJ52Maint.ddlUser8fld.AddItem("Field_4")
+gui.FMobileJ52Maint.ddlUser8fld.AddItem("Field_5")
+gui.FMobileJ52Maint.ddlUser8fld.AddItem("Field_6")
+gui.FMobileJ52Maint.ddlUser8fld.AddItem("Field_7")
+gui.FMobileJ52Maint.ddlUser8fld.AddItem("Field_8")
+gui.FMobileJ52Maint.ddlUser8fld.AddItem("Field_9")
+gui.FMobileJ52Maint.ddlUser8fld.AddItem("Field_10")
+gui.FMobileJ52Maint.ddlUser8fld.AddItem("Field_11")
+gui.FMobileJ52Maint.ddlUser8fld.AddItem("Field_12")
+gui.FMobileJ52Maint.ddlUser8fld.AddItem("Field_13")
+gui.FMobileJ52Maint.ddlUser8fld.AddItem("Field_14")
+gui.FMobileJ52Maint.ddlUser8fld.AddItem("Field_15")
+gui.FMobileJ52Maint.ddlUser8fld.ListIndex(0)
+
+gui.FMobileJ52Maint.ddlUser9fld.AddItem("N/A")
+gui.FMobileJ52Maint.ddlUser9fld.AddItem("Field_1")
+gui.FMobileJ52Maint.ddlUser9fld.AddItem("Field_2")
+gui.FMobileJ52Maint.ddlUser9fld.AddItem("Field_3")
+gui.FMobileJ52Maint.ddlUser9fld.AddItem("Field_4")
+gui.FMobileJ52Maint.ddlUser9fld.AddItem("Field_5")
+gui.FMobileJ52Maint.ddlUser9fld.AddItem("Field_6")
+gui.FMobileJ52Maint.ddlUser9fld.AddItem("Field_7")
+gui.FMobileJ52Maint.ddlUser9fld.AddItem("Field_8")
+gui.FMobileJ52Maint.ddlUser9fld.AddItem("Field_9")
+gui.FMobileJ52Maint.ddlUser9fld.AddItem("Field_10")
+gui.FMobileJ52Maint.ddlUser9fld.AddItem("Field_11")
+gui.FMobileJ52Maint.ddlUser9fld.AddItem("Field_12")
+gui.FMobileJ52Maint.ddlUser9fld.AddItem("Field_13")
+gui.FMobileJ52Maint.ddlUser9fld.AddItem("Field_14")
+gui.FMobileJ52Maint.ddlUser9fld.AddItem("Field_15")
+gui.FMobileJ52Maint.ddlUser9fld.ListIndex(0)
+
+gui.FMobileJ52Maint.ddlmanualclose.AddItem("N/A")
+gui.FMobileJ52Maint.ddlmanualclose.AddItem("Field_1")
+gui.FMobileJ52Maint.ddlmanualclose.AddItem("Field_2")
+gui.FMobileJ52Maint.ddlmanualclose.AddItem("Field_3")
+gui.FMobileJ52Maint.ddlmanualclose.AddItem("Field_4")
+gui.FMobileJ52Maint.ddlmanualclose.AddItem("Field_5")
+gui.FMobileJ52Maint.ddlmanualclose.AddItem("Field_6")
+gui.FMobileJ52Maint.ddlmanualclose.AddItem("Field_7")
+gui.FMobileJ52Maint.ddlmanualclose.AddItem("Field_8")
+gui.FMobileJ52Maint.ddlmanualclose.AddItem("Field_9")
+gui.FMobileJ52Maint.ddlmanualclose.AddItem("Field_10")
+gui.FMobileJ52Maint.ddlmanualclose.AddItem("Field_11")
+gui.FMobileJ52Maint.ddlmanualclose.AddItem("Field_12")
+gui.FMobileJ52Maint.ddlmanualclose.AddItem("Field_13")
+gui.FMobileJ52Maint.ddlmanualclose.AddItem("Field_14")
+gui.FMobileJ52Maint.ddlmanualclose.AddItem("Field_15")
+gui.FMobileJ52Maint.ddlmanualclose.ListIndex(0)
+
+gui.FMobileJ52Maint.ddllabelqty.AddItem("N/A")
+gui.FMobileJ52Maint.ddllabelqty.AddItem("Field_1")
+gui.FMobileJ52Maint.ddllabelqty.AddItem("Field_2")
+gui.FMobileJ52Maint.ddllabelqty.AddItem("Field_3")
+gui.FMobileJ52Maint.ddllabelqty.AddItem("Field_4")
+gui.FMobileJ52Maint.ddllabelqty.AddItem("Field_5")
+gui.FMobileJ52Maint.ddllabelqty.AddItem("Field_6")
+gui.FMobileJ52Maint.ddllabelqty.AddItem("Field_7")
+gui.FMobileJ52Maint.ddllabelqty.AddItem("Field_8")
+gui.FMobileJ52Maint.ddllabelqty.AddItem("Field_9")
+gui.FMobileJ52Maint.ddllabelqty.AddItem("Field_10")
+gui.FMobileJ52Maint.ddllabelqty.AddItem("Field_11")
+gui.FMobileJ52Maint.ddllabelqty.AddItem("Field_12")
+gui.FMobileJ52Maint.ddllabelqty.AddItem("Field_13")
+gui.FMobileJ52Maint.ddllabelqty.AddItem("Field_14")
+gui.FMobileJ52Maint.ddllabelqty.AddItem("Field_15")
+gui.FMobileJ52Maint.ddllabelqty.ListIndex(0)
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(ErrorMessage, "ErrorNumber", V.Ambient.ErrorNumber, "ErrorDescription", V.Ambient.ErrorDescription, "Subroutine", V.Ambient.CurrentSubroutine, "Callback", "FMobileJ52Maint_Unload")
+F.Intrinsic.Control.EndTry
+Program.Sub.LoadFieldList.End
+Program.Sub.chkStockingBin_Click.Start
+F.Intrinsic.Control.Try
+
+F.Intrinsic.Control.CallSub(ChangesMade)
+
+F.Intrinsic.Control.If(V.Screen.FMobileJ52Maint!chkStockingBin.CheckedAsBoolean)
+	gui.FMobileJ52Maint.chkDefaultBin.Value(0)
+	gui.FMobileJ52Maint.txtToBinJ52.Text("")
+	gui.FMobileJ52Maint.ddlBinfld.Text("")
+	'gui.FMobileJ52Maint.ddlBinfld.Enabled("False")
+F.Intrinsic.Control.Else
+	gui.FMobileJ52Maint.ddlBinfld.Enabled("True")	
+F.Intrinsic.Control.EndIf
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(ErrorMessage, "ErrorNumber", V.Ambient.ErrorNumber, "ErrorDescription", V.Ambient.ErrorDescription, "Subroutine", V.Ambient.CurrentSubroutine, "Callback", "FMobileJ52Maint_Unload")
+F.Intrinsic.Control.EndTry
+Program.Sub.chkStockingBin_Click.End
+Program.Sub.chkDefaultBin_Click.Start
+F.Intrinsic.Control.Try
+
+F.Intrinsic.Control.CallSub(ChangesMade)
+
+F.Intrinsic.Control.If(V.Screen.FMobileJ52Maint!chkDefaultBin.CheckedAsBoolean)
+	gui.FMobileJ52Maint.chkStockingBin.Value(0)
+	gui.FMobileJ52Maint.txtToBinJ52.Text("")
+	gui.FMobileJ52Maint.ddlBinfld.Text("")
+	'gui.FMobileJ52Maint.ddlBinfld.Enabled("False")
+F.Intrinsic.Control.Else
+	gui.FMobileJ52Maint.ddlBinfld.Enabled("True")
+F.Intrinsic.Control.EndIf
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(ErrorMessage, "ErrorNumber", V.Ambient.ErrorNumber, "ErrorDescription", V.Ambient.ErrorDescription, "Subroutine", V.Ambient.CurrentSubroutine, "Callback", "FMobileJ52Maint_Unload")
+F.Intrinsic.Control.EndTry
+Program.Sub.chkDefaultBin_Click.End
+
+Program.Sub.chkOverrideLabelQuantity_Click.Start
+F.Intrinsic.Control.Try
+
+F.Intrinsic.Control.CallSub(ChangesMade)
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(ErrorMessage, "ErrorNumber", V.Ambient.ErrorNumber, "ErrorDescription", V.Ambient.ErrorDescription, "Subroutine", V.Ambient.CurrentSubroutine, "Callback", "FMobileJ52Maint_Unload")
+F.Intrinsic.Control.EndTry
+Program.Sub.chkOverrideLabelQuantity_Click.End
+Program.Sub.FormLockNotifications_UnLoad.Start
+F.Intrinsic.Control.Try
+
+GUI.FormLockNotifications..Visible(False)
+gui.FMobileJ52Maint..Enabled(True)
+gui.FMobileJ52Maint..SetFocus(True)
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(ErrorMessage, "ErrorNumber", V.Ambient.ErrorNumber, "ErrorDescription", V.Ambient.ErrorDescription, "Subroutine", V.Ambient.CurrentSubroutine, "Callback", "FMobileJ52Maint_Unload")
+F.Intrinsic.Control.EndTry
+Program.Sub.FormLockNotifications_UnLoad.End
+
+Program.Sub.chkLockNotifications_Click.Start
+F.Intrinsic.Control.Try
+
+GUI.FormLockNotifications.txtSender.Enabled(V.Screen.FormLockNotifications!chkLockNotifications.CheckedAsBoolean)
+GUI.FormLockNotifications.txtRecipientAddresses.Enabled(V.Screen.FormLockNotifications!chkLockNotifications.CheckedAsBoolean)
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(ErrorMessage, "ErrorNumber", V.Ambient.ErrorNumber, "ErrorDescription", V.Ambient.ErrorDescription, "Subroutine", V.Ambient.CurrentSubroutine, "Callback", "FMobileJ52Maint_Unload")
+F.Intrinsic.Control.EndTry
+Program.Sub.chkLockNotifications_Click.End
+
+Program.Sub.cmdSaveLockNotifications_Click.Start
+F.Intrinsic.Control.Try
+
+V.Local.sPath.Declare(String)
+V.Local.sContents.Declare(String)
+V.Local.sFile.Declare(String)
+
+'check path
+F.Intrinsic.String.Build("{0}\Custom\5235\{1}\Work Order Lock Notifications", V.Caller.GlobalDir, V.Caller.CompanyCode, V.Local.sPath)
+F.Intrinsic.Control.CallSub(CheckDirectories, "Directories", V.Local.sPath)
+
+F.Intrinsic.String.Build("{0}-{1}-{2}", V.Screen.FormLockNotifications!txtAntenna.Text.Trim, V.Screen.FormLockNotifications!txtReader.Text.Trim, V.Screen.FormLockNotifications!txtTransaction.Text.Trim, V.Local.sFile)
+F.Intrinsic.File.MakeFilenameFriendly(V.Local.sFile, V.Local.sFile)
+
+'build filename
+F.Intrinsic.String.Build("{0}\{1}.dat", V.Local.sPath, V.Local.sFile, V.Local.sPath)
+
+'build file contents
+F.Intrinsic.String.Build("{0}{1}{2}{1}{3}", V.Screen.FormLockNotifications!chkLockNotifications.CheckedAsBoolean, V.Ambient.NewLine, V.Screen.FormLockNotifications!txtSender.Text.Trim, V.Screen.FormLockNotifications!txtRecipientAddresses.Text.Trim, V.Local.sContents)
+
+'save to file
+F.Intrinsic.File.String2File(V.Local.sPath, V.Local.sContents)
+
+F.Intrinsic.Control.CallSub(FormLockNotifications_UnLoad)
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(ErrorMessage, "ErrorNumber", V.Ambient.ErrorNumber, "ErrorDescription", V.Ambient.ErrorDescription, "Subroutine", V.Ambient.CurrentSubroutine, "Callback", "FMobileJ52Maint_Unload")
+F.Intrinsic.Control.EndTry
+Program.Sub.cmdSaveLockNotifications_Click.End
+Program.Sub.cmdJ52LockNotifications_Click.Start
+F.Intrinsic.Control.Try
+
+GUI.FormLockNotifications.txtAntenna.Text(V.Screen.FMobileJ52Maint!txtAntName.Text.Trim)
+GUI.FormLockNotifications.txtReader.Text(V.Screen.FMobileJ52Maint!txtReader.Text.Trim)
+GUI.FormLockNotifications.txtTransaction.Text("J52")
+
+F.Intrinsic.Control.CallSub(LoadLockNotifications, "Antenna", V.Screen.FMobileJ52Maint!txtAntName.Text.Trim, "Reader", V.Screen.FMobileJ52Maint!txtReader.Text.Trim, "Transaction", "J52")
+
+gui.FMobileJ52Maint..Enabled(False)
+GUI.FormLockNotifications..Show
+GUI.FormLockNotifications..SetFocus
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(ErrorMessage, "ErrorNumber", V.Ambient.ErrorNumber, "ErrorDescription", V.Ambient.ErrorDescription, "Subroutine", V.Ambient.CurrentSubroutine, "Callback", "FMobileJ52Maint_Unload")
+F.Intrinsic.Control.EndTry
+Program.Sub.cmdJ52LockNotifications_Click.End
+Program.Sub.cmdJ55WOLockNotifications_Click.Start
+F.Intrinsic.Control.Try
+
+GUI.FormLockNotifications.txtAntenna.Text(V.Screen.FMobileJ52Maint!txtAntName.Text.Trim)
+GUI.FormLockNotifications.txtReader.Text(V.Screen.FMobileJ52Maint!txtReader.Text.Trim)
+GUI.FormLockNotifications.txtTransaction.Text("J55")
+
+F.Intrinsic.Control.CallSub(LoadLockNotifications, "Antenna", V.Screen.FMobileJ52Maint!txtAntName.Text.Trim, "Reader", V.Screen.FMobileJ52Maint!txtReader.Text.Trim, "Transaction", "J55")
+
+gui.FMobileJ52Maint..Enabled(False)
+GUI.FormLockNotifications..Show
+GUI.FormLockNotifications..SetFocus
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(ErrorMessage, "ErrorNumber", V.Ambient.ErrorNumber, "ErrorDescription", V.Ambient.ErrorDescription, "Subroutine", V.Ambient.CurrentSubroutine, "Callback", "FMobileJ52Maint_Unload")
+F.Intrinsic.Control.EndTry
+Program.Sub.cmdJ55WOLockNotifications_Click.End
+
+Program.Sub.LoadLockNotifications.Start
+'pass ANTENNA, READER, TRANSACTION
+
+F.Intrinsic.Control.Try
+
+V.Local.sPath.Declare(String)
+V.Local.sContents.Declare(String)
+V.Local.bExists.Declare(Boolean)
+V.Local.sFileName.Declare(String)
+
+F.Intrinsic.String.Build("{0}-{1}-{2}", V.Args.Antenna, V.Args.Reader, V.Args.Transaction, V.Local.sFileName)
+F.Intrinsic.File.MakeFilenameFriendly(V.Local.sFileName, V.Local.sFileName)
+
+F.Intrinsic.String.Build("{0}\Custom\5235\{1}\Work Order Lock Notifications\{2}.dat", V.Caller.GlobalDir, V.Caller.CompanyCode, V.Local.sFileName, V.Local.sPath)
+F.Intrinsic.File.Exists(V.Local.sPath, V.Local.bExists)
+
+F.Intrinsic.Control.If(V.Local.bExists)
+	F.Intrinsic.File.File2String(V.Local.sPath, V.Local.sContents)
+	F.Intrinsic.String.Split(V.Local.sContents, V.Ambient.NewLine, V.Local.sContents)
+	F.Intrinsic.Control.If(V.Local.sContents.UBound, =, 2)
+		GUI.FormLockNotifications.chkLockNotifications.Value(V.Local.sContents(0))
+		GUI.FormLockNotifications.txtSender.Text(V.Local.sContents(1))
+		GUI.FormLockNotifications.txtRecipientAddresses.Text(V.Local.sContents(2))
+	F.Intrinsic.Control.Else
+		GUI.FormLockNotifications.chkLockNotifications.Value(False)
+		GUI.FormLockNotifications.txtSender.Text("")
+		GUI.FormLockNotifications.txtRecipientAddresses.Text("")
+	F.Intrinsic.Control.EndIf
+F.Intrinsic.Control.Else
+	GUI.FormLockNotifications.chkLockNotifications.Value(False)
+	GUI.FormLockNotifications.txtSender.Text("")
+	GUI.FormLockNotifications.txtRecipientAddresses.Text("")
+F.Intrinsic.Control.EndIf
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(ErrorMessage, "ErrorNumber", V.Ambient.ErrorNumber, "ErrorDescription", V.Ambient.ErrorDescription, "Subroutine", V.Ambient.CurrentSubroutine, "Callback", "FMobileJ52Maint_Unload")
+F.Intrinsic.Control.EndTry
+Program.Sub.LoadLockNotifications.End
+
+Program.Sub.CheckDirectories.Start
+'check if the given import directories exist
+'create them if they don't
+'pass directories delimited with *!*
+
+F.Intrinsic.Control.Try
+
+V.Local.sDirectories.Declare(String)
+V.Local.sPath.Declare(String)
+V.Local.bExists.Declare(Boolean)
+V.Local.iCounter.Declare(Long)
+
+V.Local.sDirectories.Set(V.Args.Directories)
+F.Intrinsic.String.Split(V.Local.sDirectories, "*!*", V.Local.sDirectories)
+
+F.Intrinsic.Control.For(V.Local.iCounter, 0, V.Local.sDirectories.UBound, 1)
+	V.Local.sPath.Set(V.Local.sDirectories(V.Local.iCounter))
+	F.Intrinsic.File.DirExists(V.Local.sPath, V.Local.bExists)
+	F.Intrinsic.Control.If(V.Local.bExists.Not)
+		F.Intrinsic.File.CreateDir(V.Local.sPath)
+	F.Intrinsic.Control.EndIf
+F.Intrinsic.Control.Next(V.Local.iCounter)
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(ErrorMessage, "ErrorNumber", V.Ambient.ErrorNumber, "ErrorDescription", V.Ambient.ErrorDescription, "Subroutine", V.Ambient.CurrentSubroutine, "Callback", "FMobileJ52Maint_Unload")
+F.Intrinsic.Control.EndTry
+Program.Sub.CheckDirectories.End
+
+Program.Sub.LoadOptions.Start
+V.Local.sCostMethod.Declare(String)
+V.Local.iCostMethod.Declare(Long)
+V.Local.bLot.Declare(Boolean, False)
+v.Local.sAutoLotMethod.Declare(String)
+
+'lookup WIP2FG partial costing method
+F.Global.General.ReadOption(401163, 3, 0, V.Local.iCostMethod)
+F.Intrinsic.Control.SelectCase(V.Local.iCostMethod)
+	F.Intrinsic.Control.Case(1)
+		V.Local.sCostMethod.Set("P-Price")
+	F.Intrinsic.Control.Case(2)
+		V.Local.sCostMethod.Set("E-Estimate")
+	F.Intrinsic.Control.Case(3)
+		V.Local.sCostMethod.Set("I-Inventory")
+	F.Intrinsic.Control.Case(4)
+		V.Local.sCostMethod.Set("A-Actual")
+	F.Intrinsic.Control.Case(5)
+		V.Local.sCostMethod.Set("R-Remaining")
+	F.Intrinsic.Control.Case(6)
+		V.Local.sCostMethod.Set("L-Alt Cost")
+F.Intrinsic.Control.EndSelect
+gui.FMobileJ52Maint.txtclosemethod.Text(V.Local.sCostMethod)
+
+'read the SS > Company Options (Advanced) > Manufacturing > Auto Number Lots with Work Order-Suffix in WIP to FG
+F.Global.General.ReadOption(401282, 0, False, V.Local.bLot)
+f.Intrinsic.Control.If(v.Local.bLot)
+	v.Local.sAutoLotMethod.Set("Adv Mfg-Job-Suffix")
+f.Intrinsic.Control.EndIf
+'read the SS > Company Options (Advanced) > Inventory > Auto lot PO Receipt and WIP to FG
+F.Global.General.ReadOption(400561, 0, False, 0, V.Local.bLot)
+f.Intrinsic.Control.If(v.Local.bLot)
+	v.Local.sAutoLotMethod.Set("Adv Inv-Auto Lot")
+f.Intrinsic.Control.EndIf
+gui.FMobileJ52Maint.txtautolot.Text(V.Local.sAutoLotMethod)
+
+Program.Sub.LoadOptions.End
+Program.Sub.txtcopiesJ52_Change.Start
+
+Program.Sub.txtcopiesJ52_Change.End
+
+Program.Sub.Comments.Start
+${$5$}$2.0.0.0$}$2
+${$6$}$bstevens$}$20240219073030780$}$3Pg7+K2MGztoXyjxMVZqWaM5g3GOUsSNufBpXkESEJSrNgQJhg41iuJq8btSXFQFE9ylbH9Qni3eP7HZs7Q9bw==
+Program.Sub.Comments.End

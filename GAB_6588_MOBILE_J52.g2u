@@ -1,0 +1,1382 @@
+﻿Program.Sub.Preflight.Start
+V.Global.sFile.Declare(String)
+V.Global.iTagReads.Declare(Long, 0)
+V.Global.iTransactions.Declare(Long, 0)
+V.Global.iSuccessfulTransactions.Declare(Long, 0)
+V.Global.iO90Transactions.Declare(Long, 0)
+V.Global.iJ55Transactions.Declare(Long, 0)
+V.Global.iL01Transactions.Declare(Long, 0)
+V.Global.iJ52Transactions.Declare(Long, 0)
+V.Global.iP10Transactions.Declare(Long, 0)
+V.Global.iS99Transactions.Declare(Long, 0)
+Program.External.Include.Library("GAB_6588_2003.lib")
+Program.External.Include.Library("JB0455.lib")
+Program.External.Include.Library("6016.lib")
+V.Global.bError.Declare(Boolean, False)
+V.Global.sTransID.Declare(String)
+Program.Sub.Preflight.End
+
+Program.Sub.Main.Start
+'Built for M-Industries
+'12/28/22 quote 13907 enhancement for Boyce Highlands/Highland Hardwoods
+F.Intrinsic.Control.Try
+V.Local.sError.Declare
+F.ODBC.Connection!Con.OpenCompanyConnection(300)
+F.ODBC.Connection!Cony.Opencommonconnection
+
+F.Intrinsic.Control.CallSub(LoadJ52Data)
+F.Intrinsic.Control.CallSub(LoadJ52TransactionSettingS)
+'Function.Intrinsic.Debug.Stop
+
+F.Intrinsic.Control.CallSub(J52SplitTable)
+'Function.Intrinsic.Debug.Stop
+F.Intrinsic.Control.CallSub(LoadExtraData)
+'Function.Intrinsic.Debug.Stop
+F.Intrinsic.Control.CallSub(UploadJ52Transactions)
+
+F.Intrinsic.Control.CallSub(Exit)
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",v.Caller.ScriptFile,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	
+F.Intrinsic.Control.EndTry
+Program.Sub.Main.End
+
+
+Program.Sub.LoadJ52Data.Start
+F.Intrinsic.Control.Try
+V.Local.sError.Declare
+
+V.Local.sSQL.Declare(String)
+V.Local.iCounter.Declare(Long)
+V.Local.sTransID.Declare(String)
+v.Local.sTransSfx.Declare(String)
+v.Local.sPrinter.Declare(String)
+v.Local.sResults.Declare
+
+'Set Gs Mobile Transaction parameters
+V.Local.sTransID.Set(V.Passed.DATA-TRANSID)
+v.Global.sTransID.Set(v.Local.sTransID)
+V.Local.sTransSfx.Set("0000")
+V.Local.sPrinter.Set("")
+
+'add pending status message
+v.Local.sResults.Set("<script> function autoRefresh() {window.location=window.location.href;} setInterval('autoRefresh()',5000);</script><tr><td style=color:Orange;font-weight:bold;><center><mark>Processing</mark> standby for result...</tr></td></center>")
+F.Global.Mobile.setcustomresult(v.Caller.CompanyCode,v.Global.sTransID,v.Local.sResults)
+
+F.Intrinsic.String.BUILD("Select WL.TRANS_ID, SEQ, 'J52' AS TRANS, FIELD_1, FIELD_2, FIELD_3, FIELD_4, FIELD_5, FIELD_6, FIELD_7, FIELD_8, FIELD_9, FIELD_10, FIELD_11, FIELD_12, FIELD_13, FIELD_14, FIELD_15, LABEL_PRINTER AS MOBILE_USER_PRINTER, USER_ID AS MOBILE_USERID from WIRELESS_LINE WL LEFT OUTER JOIN WIRELESS_HDR WH ON WL.TRANS_ID=WH.TRANS_ID AND WL.SEQ = '0000' where WL.TRANS_ID = '{0}'",V.passed.DATA-TRANSID,V.Local.sSQL)
+
+'load the RFID scans to be processed
+F.Data.DataTable.CreateFromSQL("dtRFIDRaw", "Con", V.Local.sSQL, True)
+
+'if nothing to process, exit
+F.Intrinsic.Control.If(V.DataTable.dtRFIDRaw.RowCount, =, 0)
+	F.Data.DataTable.Close("dtRFIDRaw")
+	F.Intrinsic.Control.CallSub(Exit)
+F.Intrinsic.Control.EndIf
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",v.Caller.ScriptFile,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+F.Intrinsic.Control.EndTry
+Program.Sub.LoadJ52Data.End
+
+Program.Sub.LoadJ52TransactionSettings.Start
+'load the OPTIONS set in the J52 custom mobile maintenance program
+
+F.Intrinsic.Control.Try
+V.Local.sError.Declare
+
+V.Local.sColumns.Declare(String)
+
+F.Data.DataTable.CreateFromSQL("dtTransactionSettings", "Con", "select RTRIM(TX_CODE) as TRANS, RTRIM(TOBIN) as TOBIN, PRINT_FLAG, RTRIM(PRINTER) as PRINTER, RTRIM(EXTRA_OPTION) EXTRA_OPTION, LABEL_COPIES, FIELD_WO, FIELD_QTY, FIELD_LOT, FIELD_BIN, FIELD_HEAT, FIELD_SERIAL, FIELD_USER1, FIELD_USER2, FIELD_USER3, FIELD_USER4, FIELD_USER5, FIELD_USER6, FIELD_USER7, FIELD_USER8, FIELD_USER9,FIELD_MANUAL_CLOSE,FIELD_LABEL_QTY,CARTON_LABELS from GAB_6588_J52_MAINT where ENABLED = 1 AND TX_CODE = 'J52'", True)
+
+F.Data.DataTable.AddExpressionColumn("dtTransactionSettings", "PRINT", "STRING", "IIF([PRINT_FLAG] = 'TRUE', 1, 0)")
+V.Local.sColumns.Set("B.TRANS_ID*!*A.TRANS*!*A.TOBIN*!*A.PRINT*!*A.PRINTER*!*A.EXTRA_OPTION*!*A.LABEL_COPIES*!*A.FIELD_WO*!*A.FIELD_QTY*!*A.FIELD_LOT*!*A.FIELD_BIN*!*A.FIELD_HEAT*!*A.FIELD_SERIAL*!*A.FIELD_USER1*!*A.FIELD_USER2*!*A.FIELD_USER3*!*A.FIELD_USER4*!*A.FIELD_USER5*!*A.FIELD_USER6*!*A.FIELD_USER7*!*A.FIELD_USER8*!*A.FIELD_USER9*!*A.PRINT_FLAG*!*A.FIELD_MANUAL_CLOSE*!*A.FIELD_LABEL_QTY*!*A.CARTON_LABELS*!*B.FIELD_1*!*B.FIELD_2*!*B.FIELD_3*!*B.FIELD_4*!*B.FIELD_5*!*B.FIELD_6*!*B.FIELD_7*!*B.FIELD_8*!*B.FIELD_9*!*B.FIELD_10*!*B.FIELD_11*!*B.FIELD_12*!*B.FIELD_13*!*B.FIELD_14*!*B.FIELD_15*!*B.MOBILE_USER_PRINTER*!*B.MOBILE_USERID")
+F.Data.Linq.Join("RightJoin", "DataTable", "dtTransactionSettings*!*A", "DataTable", "dtRFIDRaw*!*B", "A.TRANS = B.TRANS", V.Local.sColumns, "", "", "", "dtRFID", True)
+
+F.Intrinsic.Control.If(V.DataTable.dtRFID.RowCount, =, 0)
+	F.Data.DataTable.Close("dtRFID")
+	F.Intrinsic.Control.CallSub(Exit)
+F.Intrinsic.Control.EndIf
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",v.Caller.ScriptFile,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+F.Intrinsic.Control.EndTry
+Program.Sub.LoadJ52TransactionSettings.End
+
+Program.Sub.J52SplitTable.Start
+'create tables from the main table based on transaction type
+
+F.Intrinsic.Control.Try
+V.Local.sError.Declare
+
+V.Local.sSql.Declare(String)
+V.Local.iCounter.Declare(Long)
+V.Local.sTemp.Declare(String)
+V.Local.iLength.Declare(Long)
+V.Local.sQuantityTemp.Declare(String)
+V.Local.sField.Declare(String)
+v.Local.sPrefix.Declare(String)
+v.Local.sjob.Declare(String)
+v.Local.sSuffix.Declare(String)
+v.Local.sUPID.Declare(String)
+V.Local.iRet.Declare(Long)
+v.Local.slen.Declare(String)
+v.Local.bisnumeric.Declare(Boolean)
+
+
+F.Data.DataTable.AddColumn("dtRFID", "JOB", "String")
+F.Data.DataTable.AddColumn("dtRFID", "SUFFIX", "String")
+'F.Data.DataTable.AddColumn("dtRFID", "QTY", "String")
+F.Data.DataTable.AddColumn("dtRFID", "QTY", "float")
+F.Data.DataTable.AddColumn("dtRFID", "LOT", "String")
+F.Data.DataTable.AddColumn("dtRFID", "HEAT", "String")
+F.Data.DataTable.AddColumn("dtRFID", "SERIAL", "String")
+F.Data.DataTable.AddColumn("dtRFID", "USERFIELD1", "String")
+F.Data.DataTable.AddColumn("dtRFID", "USERFIELD2", "String")
+F.Data.DataTable.AddColumn("dtRFID", "USERFIELD3", "String")
+F.Data.DataTable.AddColumn("dtRFID", "USERFIELD4", "String")
+F.Data.DataTable.AddColumn("dtRFID", "USERFIELD5", "String")
+F.Data.DataTable.AddColumn("dtRFID", "USERFIELD6", "String")
+F.Data.DataTable.AddColumn("dtRFID", "USERFIELD7", "String")
+F.Data.DataTable.AddColumn("dtRFID", "USERFIELD8", "String")
+F.Data.DataTable.AddColumn("dtRFID", "USERFIELD9", "String")
+F.Data.DataTable.AddColumn("dtRFID", "N/A", "String")
+F.Data.DataTable.AddColumn("dtRFID", "LABELCOPIES", "String")
+F.Data.DataTable.AddColumn("dtRFID", "MANUALCLOSE", "String")
+F.Data.DataTable.AddColumn("dtRFID", "LABEL_QTY", "String") '- added 2/15/24
+
+F.Intrinsic.Control.For(V.Local.iCounter, 0, V.DataTable.dtRFID.RowCount--, 1)
+
+
+	'F.Intrinsic.String.Replace(V.DataTable.dtRFID(V.Local.iCounter).FIELD_WO!FieldValTrim, "$%", "", V.Local.sTemp)
+	
+	F.Intrinsic.Control.SelectCase(V.DataTable.dtRFID(V.Local.iCounter).TRANS!FieldValTrim)
+		F.Intrinsic.Control.Case("J52")	
+		'WO
+			F.Intrinsic.String.Left(V.DataTable.dtRFID(V.Local.iCounter).[V.DataTable.dtRFID(V.Local.iCounter).FIELD_WO!FIELDVALTRIM]!FIELDVALTRIM,2,V.Local.sPrefix)
+			F.Intrinsic.Control.If(v.Local.sPrefix,=,"$%")
+				F.Intrinsic.String.Mid(V.DataTable.dtRFID(V.Local.iCounter).[V.DataTable.dtRFID(V.Local.iCounter).FIELD_WO!FIELDVALTRIM]!FIELDVALTRIM,3,6,V.Local.sJob)
+				F.Intrinsic.String.Mid(V.DataTable.dtRFID(V.Local.iCounter).[V.DataTable.dtRFID(V.Local.iCounter).FIELD_WO!FIELDVALTRIM]!FIELDVALTRIM,9,3,V.Local.sSuffix)
+			F.Intrinsic.Control.else		
+				f.Intrinsic.String.Len(V.DataTable.dtRFID(V.Local.iCounter).[V.DataTable.dtRFID(V.Local.iCounter).FIELD_WO!FIELDVALTRIM]!FIELDVALTRIM,v.Local.slen)
+				'F.Intrinsic.Control.If(V.DataTable.dtRFID(V.Local.iCounter).[V.DataTable.dtRFID(V.Local.iCounter).FIELD_WO!FIELDVALTRIM]!FIELDVALTRIM,>,6)
+				F.Intrinsic.Control.If(v.Local.slen,>,6)
+					f.Intrinsic.String.Split(V.DataTable.dtRFID(V.Local.iCounter).[V.DataTable.dtRFID(V.Local.iCounter).FIELD_WO!FIELDVALTRIM]!FIELDVALTRIM,"-",v.Local.sTemp)
+					v.Local.sjob.Set(v.Local.sTemp(0))
+					v.Local.sSuffix.Set(v.Local.sTemp(1))
+				f.Intrinsic.Control.Else
+					v.Local.sjob.Set(V.DataTable.dtRFID(V.Local.iCounter).[V.DataTable.dtRFID(V.Local.iCounter).FIELD_WO!FIELDVALTRIM]!FIELDVALTRIM)
+					v.Local.sSuffix.Set("")
+				f.Intrinsic.Control.EndIf
+			f.Intrinsic.Control.EndIf
+			F.Data.DataTable.SetValue("dtRFID", V.Local.iCounter, "JOB", V.Local.sjob, "SUFFIX", v.Local.sSuffix)
+
+		'QTY
+		F.Intrinsic.Math.IsNumeric(V.DataTable.dtRFID(V.Local.iCounter).[V.DataTable.dtRFID(V.Local.iCounter).FIELD_QTY!FIELDVALTRIM]!FIELDVALTRIM,v.Local.bisnumeric)
+		'need to evaluate qty is numeric
+		F.Intrinsic.Control.If(v.Local.bisnumeric)		
+			f.Data.Datatable.SetValue("dtRFID", v.Local.iCounter, "QTY", V.DataTable.dtRFID(V.Local.iCounter).[V.DataTable.dtRFID(V.Local.iCounter).FIELD_QTY!FIELDVALTRIM]!FIELDVALTRIM)		
+		F.Intrinsic.Control.else
+			F.Data.Datatable.SetValue("dtRFID", v.Local.iCounter, "QTY", 0)
+		F.Intrinsic.Control.EndIf
+		
+		'LOT
+		F.Intrinsic.Control.SelectCase(V.DataTable.dtRFID(V.Local.iCounter).FIELD_LOT!FIELDVALTRIM)
+			F.Intrinsic.Control.CaseAny("Field_1","Field_2","Field_3","Field_4","Field_5","Field_6","Field_7","Field_8","Field_9","Field_10","Field_11","Field_12","Field_13","Field_14","Field_15")
+				f.Data.Datatable.SetValue("dtRFID", v.Local.iCounter, "LOT", V.DataTable.dtRFID(V.Local.iCounter).[V.DataTable.dtRFID(V.Local.iCounter).FIELD_LOT!FIELDVALTRIM]!FIELDVALTRIM)
+			f.Intrinsic.Control.CaseElse
+				'leave blank			
+		F.Intrinsic.Control.EndSelect
+		
+		'HEAT 
+		F.Intrinsic.Control.SelectCase(V.DataTable.dtRFID(V.Local.iCounter).FIELD_HEAT!FIELDVALTRIM)
+			F.Intrinsic.Control.CaseAny("Field_1","Field_2","Field_3","Field_4","Field_5","Field_6","Field_7","Field_8","Field_9","Field_10","Field_11","Field_12","Field_13","Field_14","Field_15")
+				f.Data.Datatable.SetValue("dtRFID", v.Local.iCounter, "HEAT", V.DataTable.dtRFID(V.Local.iCounter).[V.DataTable.dtRFID(V.Local.iCounter).FIELD_HEAT!FIELDVALTRIM]!FIELDVALTRIM)
+			f.Intrinsic.Control.CaseElse
+				'leave blank			
+		F.Intrinsic.Control.EndSelect
+		
+		'SERIAL		
+		F.Intrinsic.Control.If(V.DataTable.dtRFID(V.Local.iCounter).FIELD_SERIAL!FIELDVALTRIM,<>,"N/A")		
+			f.Data.Datatable.SetValue("dtRFID", v.Local.iCounter, "SERIAL", V.DataTable.dtRFID(V.Local.iCounter).[V.DataTable.dtRFID(V.Local.iCounter).FIELD_SERIAL!FIELDVALTRIM]!FIELDVALTRIM)
+		F.Intrinsic.Control.EndIf
+
+		'BIN		
+		F.Intrinsic.Control.If(V.DataTable.dtRFID(V.Local.iCounter).FIELD_BIN!FIELDVALTRIM,<>,"N/A")	
+			'verify there is a value set for bin in form otherwise leave tobin to what it has been set to in maintenance
+			F.Intrinsic.Control.If(V.DataTable.dtRFID(V.Local.iCounter).[V.DataTable.dtRFID(V.Local.iCounter).FIELD_BIN!FIELDVALTRIM]!FIELDVALTRIM,<>,"")
+				f.Data.Datatable.SetValue("dtRFID", v.Local.iCounter, "TOBIN", V.DataTable.dtRFID(V.Local.iCounter).[V.DataTable.dtRFID(V.Local.iCounter).FIELD_BIN!FIELDVALTRIM]!FIELDVALTRIM)
+			F.Intrinsic.Control.EndIf		
+		F.Intrinsic.Control.EndIf
+		
+		
+		'USERFIELD1
+		F.Intrinsic.Control.If(V.DataTable.dtRFID(V.Local.iCounter).FIELD_USER1!FIELDVALTRIM,<>,"N/A")		
+			f.Data.Datatable.SetValue("dtRFID", v.Local.iCounter, "USERFIELD1", V.DataTable.dtRFID(V.Local.iCounter).[V.DataTable.dtRFID(V.Local.iCounter).FIELD_USER1!FIELDVALTRIM]!FIELDVALTRIM)
+		F.Intrinsic.Control.EndIf		
+		'USERFIELD2
+		F.Intrinsic.Control.If(V.DataTable.dtRFID(V.Local.iCounter).FIELD_USER2!FIELDVALTRIM,<>,"N/A")		
+			f.Data.Datatable.SetValue("dtRFID", v.Local.iCounter, "USERFIELD2", V.DataTable.dtRFID(V.Local.iCounter).[V.DataTable.dtRFID(V.Local.iCounter).FIELD_USER2!FIELDVALTRIM]!FIELDVALTRIM)
+		F.Intrinsic.Control.EndIf			
+		'USERFIELD3
+		F.Intrinsic.Control.If(V.DataTable.dtRFID(V.Local.iCounter).FIELD_USER3!FIELDVALTRIM,<>,"N/A")		
+			f.Data.Datatable.SetValue("dtRFID", v.Local.iCounter, "USERFIELD3", V.DataTable.dtRFID(V.Local.iCounter).[V.DataTable.dtRFID(V.Local.iCounter).FIELD_USER3!FIELDVALTRIM]!FIELDVALTRIM)	
+		F.Intrinsic.Control.EndIf			
+		'USERFIELD4
+		F.Intrinsic.Control.If(V.DataTable.dtRFID(V.Local.iCounter).FIELD_USER4!FIELDVALTRIM,<>,"N/A")		
+			f.Data.Datatable.SetValue("dtRFID", v.Local.iCounter, "USERFIELD4", V.DataTable.dtRFID(V.Local.iCounter).[V.DataTable.dtRFID(V.Local.iCounter).FIELD_USER4!FIELDVALTRIM]!FIELDVALTRIM)
+		F.Intrinsic.Control.EndIf			
+		'USERFIELD5
+		F.Intrinsic.Control.If(V.DataTable.dtRFID(V.Local.iCounter).FIELD_USER5!FIELDVALTRIM,<>,"N/A")		
+			f.Data.Datatable.SetValue("dtRFID", v.Local.iCounter, "USERFIELD5", V.DataTable.dtRFID(V.Local.iCounter).[V.DataTable.dtRFID(V.Local.iCounter).FIELD_USER5!FIELDVALTRIM]!FIELDVALTRIM)		
+		F.Intrinsic.Control.EndIf
+		'USERFIELD6
+		F.Intrinsic.Control.If(V.DataTable.dtRFID(V.Local.iCounter).FIELD_USER6!FIELDVALTRIM,<>,"N/A")		
+			f.Data.Datatable.SetValue("dtRFID", v.Local.iCounter, "USERFIELD6", V.DataTable.dtRFID(V.Local.iCounter).[V.DataTable.dtRFID(V.Local.iCounter).FIELD_USER6!FIELDVALTRIM]!FIELDVALTRIM)
+		F.Intrinsic.Control.EndIf
+		'USERFIELD7
+		F.Intrinsic.Control.If(V.DataTable.dtRFID(V.Local.iCounter).FIELD_USER7!FIELDVALTRIM,<>,"N/A")		
+		f.Data.Datatable.SetValue("dtRFID", v.Local.iCounter, "USERFIELD7", V.DataTable.dtRFID(V.Local.iCounter).[V.DataTable.dtRFID(V.Local.iCounter).FIELD_USER7!FIELDVALTRIM]!FIELDVALTRIM)	
+		F.Intrinsic.Control.EndIf
+		'USERFIELD8
+		F.Intrinsic.Control.If(V.DataTable.dtRFID(V.Local.iCounter).FIELD_USER8!FIELDVALTRIM,<>,"N/A")
+			f.Data.Datatable.SetValue("dtRFID", v.Local.iCounter, "USERFIELD8", V.DataTable.dtRFID(V.Local.iCounter).[V.DataTable.dtRFID(V.Local.iCounter).FIELD_USER8!FIELDVALTRIM]!FIELDVALTRIM)			
+		F.Intrinsic.Control.EndIf
+		'USERFIELD9
+		F.Intrinsic.Control.If(V.DataTable.dtRFID(V.Local.iCounter).FIELD_USER9!FIELDVALTRIM,<>,"N/A")		
+			f.Data.Datatable.SetValue("dtRFID", v.Local.iCounter, "USERFIELD9", V.DataTable.dtRFID(V.Local.iCounter).[V.DataTable.dtRFID(V.Local.iCounter).FIELD_USER9!FIELDVALTRIM]!FIELDVALTRIM)			
+		F.Intrinsic.Control.EndIf		
+		'CARTON LABEL QTY - added 2/15/24
+		F.Intrinsic.Control.If(V.DataTable.dtRFID(V.Local.iCounter).FIELD_LABEL_QTY!FIELDVALTRIM,<>,"N/A")		
+			f.Data.Datatable.SetValue("dtRFID", v.Local.iCounter, "LABEL_QTY", V.DataTable.dtRFID(V.Local.iCounter).[V.DataTable.dtRFID(V.Local.iCounter).FIELD_LABEL_QTY!FIELDVALTRIM]!FIELDVALTRIM)			
+		F.Intrinsic.Control.EndIf		
+		F.Intrinsic.Control.If(V.DataTable.dtRFID(V.Local.iCounter).[V.DataTable.dtRFID(V.Local.iCounter).FIELD_LABEL_QTY!FIELDVALTRIM]!FIELDVALTRIM,<>,"")
+			F.Intrinsic.Math.IsNumeric(V.DataTable.dtRFID(V.Local.iCounter).[V.DataTable.dtRFID(V.Local.iCounter).FIELD_LABEL_QTY!FIELDVALTRIM]!FIELDVALTRIM,v.Local.bisnumeric)
+			'need to evaluate qty is numeric
+			F.Intrinsic.Control.If(v.Local.bisnumeric,=,False)		
+				F.Data.Datatable.SetValue("dtRFID", v.Local.iCounter, "LABEL_QTY", 1)
+			F.Intrinsic.Control.EndIf
+		f.Intrinsic.Control.EndIf		
+		
+		'LABEL COPIES
+		F.Intrinsic.Control.If(V.DataTable.dtRFID(V.Local.iCounter).LABEL_COPIES!FIELDVALTRIM,<>,"")
+			f.Data.Datatable.SetValue("dtRFID", v.Local.iCounter, "LABELCOPIES", V.DataTable.dtRFID(V.Local.iCounter).LABEL_COPIES!FIELDVALTRIM)	
+		F.Intrinsic.Control.Else
+			f.Data.Datatable.SetValue("dtRFID", v.Local.iCounter, "LABELCOPIES", "1")
+		F.Intrinsic.Control.EndIf
+		'USERFIELDMANUALCLOSE
+		F.Intrinsic.Control.If(V.DataTable.dtRFID(V.Local.iCounter).FIELD_MANUAL_CLOSE!FIELDVALTRIM,<>,"N/A")		
+			f.Data.Datatable.SetValue("dtRFID", v.Local.iCounter, "MANUALCLOSE", V.DataTable.dtRFID(V.Local.iCounter).[V.DataTable.dtRFID(V.Local.iCounter).FIELD_MANUAL_CLOSE!FIELDVALTRIM]!FIELDVALTRIM)			
+		F.Intrinsic.Control.EndIf		
+		
+	F.Intrinsic.Control.EndSelect
+	
+	'SET MOBILE USER PRINTER	
+	F.Intrinsic.Control.Try
+		F.Intrinsic.Control.If(V.DataTable.dtRFID(V.Local.iCounter).MOBILE_USER_PRINTER!FIELDVALTRIM,<>,"")
+			Function.Global.Mobile.GetPrinterNamefromID(V.DataTable.dtRFID(V.Local.iCounter).MOBILE_USER_PRINTER!FIELDVALTRIM,v.Local.sTemp)
+			'	F.Intrinsic.Control.Catch
+			'		V.Local.sTemp.Set("")
+			'	F.Intrinsic.Control.EndTry
+			f.Data.Datatable.SetValue("dtRFID", v.Local.iCounter, "MOBILE_USER_PRINTER", V.Local.sTemp)
+			f.Data.Datatable.SetValue("dtRFID", v.Local.iCounter, "PRINTER", V.Local.sTemp)
+		f.Intrinsic.Control.EndIf
+	v.Local.sPrefix.Set("")
+	v.Local.sjob.Set("")
+	v.Local.sSuffix.Set("")	
+	V.Local.sTemp.Set("")
+	F.Intrinsic.Control.Next(V.Local.iCounter)
+
+F.Data.DataTable.AddExpressionColumn("dtRFID", "JS", "String", "TRIM(JOB) + '-' + TRIM(SUFFIX)")
+
+'J52
+F.Data.DataView.Create("dtRFID", "dvJ52", 22, "TRANS = 'J52'", "")
+F.Data.DataView.ToDataTable("dtRFID", "dvJ52", "dtJ52RFID", True)
+F.Data.DataView.Close("dtRFID", "dvJ52")
+
+F.Data.DataTable.Close("dtRFID")
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",v.Caller.ScriptFile,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+F.Intrinsic.Control.EndTry
+Program.Sub.J52SplitTable.End
+
+Program.Sub.LoadExtraData.Start
+'load the extra data needed for each transaction type
+
+F.Intrinsic.Control.Try
+V.Local.sError.Declare
+
+'get j52 data
+F.Intrinsic.Control.If(V.DataTable.dtJ52RFID.RowCount, >, 0)
+	F.Data.DataView.Create("dtTransactionSettings", "dvJ52TransactionSettings", 22, "TRANS = 'J52'", "")
+	F.Intrinsic.Control.If(V.DataView.dtTransactionSettings!dvJ52TransactionSettings.RowCount, >, 0)
+		F.Intrinsic.Control.CallSub(LoadMobileJ52Data)
+	F.Intrinsic.Control.EndIf
+F.Intrinsic.Control.EndIf
+F.Data.DataTable.Close("dtJ52RFID")
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",v.Caller.ScriptFile,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+F.Intrinsic.Control.EndTry
+Program.Sub.LoadExtraData.End
+
+Program.Sub.LoadMobileJ52Data.Start
+'grab extra data needed for Wip to FG
+
+F.Intrinsic.Control.Try
+V.Local.sError.Declare
+
+V.Local.bLot.Declare(Boolean, False)
+V.Local.sJobs.Declare(String)
+V.Local.sSQL.Declare(String)
+V.Local.sLastLot.Declare(String)
+V.Local.iLastLot.Declare(Long)
+V.Local.sPartFilter.Declare(String)
+V.Local.iCounter.Declare(Long)
+V.Local.sExtraOption.Declare(String)
+V.Local.sFilter.Declare(String)
+V.Local.iDataViewCounter.Declare(Long)
+V.Local.fSum.Declare(Float)
+v.Local.slot.Declare(String)
+
+F.Data.DataTable.Clone("dtJ52RFID", "dtJ52", True)
+F.Data.DataTable.Merge("dtJ52RFID", "dtJ52", False, 2)
+F.Data.DataTable.AddExpressionColumn("dtJ52", "PRINT_CHAR", "String", "IIF([PRINT_FLAG] = 'TRUE', 'Y', 'N')")
+
+'read the SS > Company Options (Advanced) > Manufacturing > Auto Number Lots with Work Order-Suffix in WIP to FG
+F.Global.General.ReadOption(401282, 0, False, V.Local.bLot)
+F.Data.DataTable.AddColumn("dtJ52", "USE_JOB_SUFFIX_AS_LOT", "Boolean", V.Local.bLot)
+'read the SS > Company Options (Advanced) > Inventory > Auto Number Lots for PO receipt and WIP to FG
+F.Global.General.ReadOption(400561, 0, False, 0, V.Local.bLot)
+F.Data.DataTable.AddColumn("dtJ52", "USE_AUTO_LOT", "Boolean", V.Local.bLot)
+F.Intrinsic.Control.If(V.Local.bLot)
+	F.Global.General.ReadOption(400561, 3, False, 1, V.Local.sLastLot)
+	F.Intrinsic.Math.Add(V.Local.sLastLot.Long, 1, V.Local.iLastLot)
+	F.Data.DataTable.AddColumn("dtJ52", "AUTO_LOT_NUMBER", "Long", 0)
+	F.Data.DataTable.SetSeries("dtJ52", "AUTO_LOT_NUMBER", V.Local.iLastLot, 1)
+	'write back last used to op header
+	'adv inventory option
+	F.ODBC.Connection!Con.OpenRecordsetRW("rstopheader","select ID,F_LONG from OP_HEADER where ID='400561' AND SEQUENCE = '0001'")
+	F.Intrinsic.Control.If(V.ODBC.Con!rstopheader.EOF,=,False)
+'	F.Intrinsic.String.LPad(v.Local.iLastLot, "0", 6, V.Local.sLot)
+'		Function.ODBC.Con!rstopheader.Set!F_LONG(V.Local.sLot)
+		Function.ODBC.Con!rstopheader.Set!F_LONG(V.Local.iLastLot)
+		F.ODBC.Con!rstopheader.Update
+		F.ODBC.Con!rstopheader.Close
+	F.Intrinsic.Control.EndIf
+F.Intrinsic.Control.EndIf
+'build job filter
+F.Data.DataView.Create("dtJ52", "dvJ52", 22)
+F.Data.DataView.ToString("dtJ52", "dvJ52", "JS", "***NODELIMITER***", "','", V.Local.sJobs)
+F.Data.DataView.Close("dtJ52", "dvJ52")
+
+'get open quantity and other attribute fields from job header
+F.Intrinsic.String.Build("select RTRIM(A.JOB) + '-' + RTRIM(A.SUFFIX) JS, A.QTY_ORDER - A.QTY_COMPLETED OPEN, RTRIM(A.PART) PART, A.DATE_DUE, A.LOCATION, A.CUSTOMER_PO, A.PART_CUSTOMER, A.CUSTOMER, A.SALES_ORDER, A.SALES_ORDER_LINE, B.NAME_CUSTOMER CUSTOMER_NAME from V_JOB_HEADER A left outer join V_CUSTOMER_MASTER B ON A.CUSTOMER=B.CUSTOMER where JS in ('{0}')", V.Local.sJobs, V.Local.sSQL)
+F.Data.DataTable.CreateFromSQL("dtJobInfo", "Con", V.Local.sSQL)
+
+F.Data.Dictionary.CreateFromDataTable("dictOpen", "dtJobInfo", "JS", "OPEN")
+F.Data.Dictionary.SetDefaultReturn("dictOpen", 0)
+F.Data.DataTable.AddColumn("dtJ52", "OPEN", "Float", 0)
+F.Data.DataTable.FillFromDictionary("dtJ52", "dictOpen", "JS", "OPEN")
+F.Data.Dictionary.Close("dictOpen")
+
+F.Data.Dictionary.CreateFromDataTable("dictPart", "dtJobInfo", "JS", "PART")
+F.Data.Dictionary.SetDefaultReturn("dictPart", "")
+F.Data.DataTable.AddColumn("dtJ52", "PART", "String", "")
+F.Data.DataTable.FillFromDictionary("dtJ52", "dictPart", "JS", "PART")
+F.Data.Dictionary.Close("dictPart")
+
+F.Data.Dictionary.CreateFromDataTable("dictPartLoc", "dtJobInfo", "JS", "LOCATION")
+F.Data.Dictionary.SetDefaultReturn("dictPartLoc", "")
+F.Data.DataTable.AddColumn("dtJ52", "LOCATION", "String", "")
+F.Data.DataTable.FillFromDictionary("dtJ52", "dictPartLoc", "JS", "LOCATION")
+F.Data.Dictionary.Close("dictPartLoc")
+
+F.Data.Dictionary.CreateFromDataTable("dictDue", "dtJobInfo", "JS", "DATE_DUE")
+F.Data.Dictionary.SetDefaultReturn("dictDue", "1900-01-01")
+F.Data.DataTable.AddColumn("dtJ52", "DATE_DUE", "Date", "1900-01-01")
+F.Data.DataTable.FillFromDictionary("dtJ52", "dictDue", "JS", "DATE_DUE")
+F.Data.Dictionary.Close("dictDue")
+
+F.Data.Dictionary.CreateFromDataTable("dictPO", "dtJobInfo", "JS", "CUSTOMER_PO")
+F.Data.Dictionary.SetDefaultReturn("dictPO", "")
+F.Data.DataTable.AddColumn("dtJ52", "CUSTOMER_PO", "String", "")
+F.Data.DataTable.FillFromDictionary("dtJ52", "dictPO", "JS", "CUSTOMER_PO")
+F.Data.Dictionary.Close("dictPO")
+
+F.Data.Dictionary.CreateFromDataTable("dictCpart", "dtJobInfo", "JS", "PART_CUSTOMER")
+F.Data.Dictionary.SetDefaultReturn("dictCpart", "")
+F.Data.DataTable.AddColumn("dtJ52", "PART_CUSTOMER", "String", "")
+F.Data.DataTable.FillFromDictionary("dtJ52", "dictCpart", "JS", "PART_CUSTOMER")
+F.Data.Dictionary.Close("dictCpart")
+
+F.Data.Dictionary.CreateFromDataTable("dictCustomer", "dtJobInfo", "JS", "CUSTOMER")
+F.Data.Dictionary.SetDefaultReturn("dictCustomer", "")
+F.Data.DataTable.AddColumn("dtJ52", "CUSTOMER", "String", "")
+F.Data.DataTable.FillFromDictionary("dtJ52", "dictCustomer", "JS", "CUSTOMER")
+F.Data.Dictionary.Close("dictCustomer")
+
+F.Data.Dictionary.CreateFromDataTable("dictSO", "dtJobInfo", "JS", "SALES_ORDER")
+F.Data.Dictionary.SetDefaultReturn("dictSO", "")
+F.Data.DataTable.AddColumn("dtJ52", "SALES_ORDER", "String", "")
+F.Data.DataTable.FillFromDictionary("dtJ52", "dictSO", "JS", "SALES_ORDER")
+F.Data.Dictionary.Close("dictSO")
+
+F.Data.Dictionary.CreateFromDataTable("dictSOLine", "dtJobInfo", "JS", "SALES_ORDER_LINE")
+F.Data.Dictionary.SetDefaultReturn("dictSOLine", "")
+F.Data.DataTable.AddColumn("dtJ52", "SALES_ORDER_LINE", "String", "")
+F.Data.DataTable.FillFromDictionary("dtJ52", "dictSOLine", "JS", "SALES_ORDER_LINE")
+F.Data.Dictionary.Close("dictSOLine")
+
+F.Data.Dictionary.CreateFromDataTable("dictSOLine", "dtJobInfo", "JS", "CUSTOMER_NAME")
+F.Data.Dictionary.SetDefaultReturn("dictSOLine", "")
+F.Data.DataTable.AddColumn("dtJ52", "CUSTOMER_NAME", "String", "")
+F.Data.DataTable.FillFromDictionary("dtJ52", "dictSOLine", "JS", "CUSTOMER_NAME")
+F.Data.Dictionary.Close("dictSOLine")
+
+F.Data.DataTable.Close("dtJobInfo")
+
+'check for open child WOs
+F.Intrinsic.String.Build("select top 1 RTRIM(Parent_WO) + '-' + RTRIM(parent_suffix_parent) JS, CASE WHEN DATE_CLOSED = '1900-01-01' THEN 'Y' ELSE 'N' END CHILD_OPEN from V_JOB_HEADER where parent_wo = '{0}' and parent_suffix_parent = '{1}' AND DATE_CLOSED = '1900-01-01' ORDER BY JS", V.DataTable.dtJ52(V.Local.iCounter).JOB!FieldValTrim, V.DataTable.dtJ52(V.Local.iCounter).SUFFIX!FieldValTrim,V.Local.sSQL)
+F.Data.DataTable.CreateFromSQL("dtChildStatus", "Con", V.Local.sSQL)
+
+F.Data.Dictionary.CreateFromDataTable("dictOpenChildren", "dtChildStatus", "JS", "CHILD_OPEN")
+F.Data.Dictionary.SetDefaultReturn("dictOpenChildren", "N")
+F.Data.DataTable.AddColumn("dtJ52", "CHILD_OPEN", "STRING", "N")
+F.Data.DataTable.FillFromDictionary("dtJ52", "dictOpenChildren", "JS", "CHILD_OPEN")
+F.Data.Dictionary.Close("dictOpenChildren")
+F.Data.DataTable.Close("dtChildStatus")
+
+'check for open WO material sequences
+F.Intrinsic.String.Build("select TOP 1 RTRIM(JOB) + '-' + RTRIM(SUFFIX) JS, LMO, SEQ, FLAG_CLOSED, 'Y' AS 'MATL_OPEN' FROM V_JOB_OPERATIONS WHERE SEQ < '995000' AND JOB = '{0}' AND SUFFIX = '{1}' AND LMO = 'M' AND FLAG_CLOSED <> 'Y' ORDER BY SEQ", V.DataTable.dtJ52(V.Local.iCounter).JOB!FieldValTrim, V.DataTable.dtJ52(V.Local.iCounter).SUFFIX!FieldValTrim,V.Local.sSQL)
+F.Data.DataTable.CreateFromSQL("dtMatlStatus", "Con", V.Local.sSQL)
+
+F.Data.Dictionary.CreateFromDataTable("dictOpenMatl", "dtMatlStatus", "JS", "MATL_OPEN")
+F.Data.Dictionary.SetDefaultReturn("dictOpenMatl", "N")
+F.Data.DataTable.AddColumn("dtJ52", "MATL_OPEN", "STRING", "N")
+F.Data.DataTable.FillFromDictionary("dtJ52", "dictOpenMatl", "JS", "MATL_OPEN")
+F.Data.Dictionary.Close("dictOpenMatl")
+F.Data.DataTable.Close("dtMatlStatus")
+
+'get inventory info
+F.Data.DataView.Create("dtJ52", "dvJ52", 22)
+F.Data.DataView.ToString("dtJ52", "dvJ52", "PART", "***NODELIMITER***", "','", V.Local.sPartFilter)
+F.Data.DataView.Close("dtJ52", "dvJ52")
+
+F.Intrinsic.String.Build("select RTRIM(A.PART) PART, RTRIM(BIN) BIN, RTRIM(STOCK_BIN) STOCK_BIN, RTRIM(UM_INVENTORY) UM, RTRIM(DESCRIPTION) DESCRIPTION, RTRIM(DESCRIPTION_2) DESCRIPTION_2, RTRIM(DESCRIPTION_3) DESCRIPTION_3 ,FLAG_LOT, PRODUCT_LINE, CNTNRS_PER_PALLET, TEXT AS EXTRA_TEXT, PCS_PER_CNTNR from V_INVENTORY_ALL A LEFT OUTER JOIN INV_EXTRA_TEXT B ON A.PART=B.PART where PART in ('{0}') and LOCATION = '{1}'", V.Local.sPartFilter, V.DataTable.dtJ52(V.Local.iCounter).LOCATION!FieldValTrim, V.Local.sSQL)
+F.Data.DataTable.CreateFromSQL("dtBins", "Con", V.Local.sSQL)
+
+F.Data.Dictionary.CreateFromDataTable("dictDefaultBin", "dtBins", "PART", "BIN")
+F.Data.Dictionary.SetDefaultReturn("dictDefaultBin", "")
+F.Data.DataTable.AddColumn("dtJ52", "DEFAULT_BIN", "String", "")
+F.Data.DataTable.FillFromDictionary("dtJ52", "dictDefaultBin", "PART", "DEFAULT_BIN")
+F.Data.Dictionary.Close("dictDefaultBin")
+
+F.Data.Dictionary.CreateFromDataTable("dictStockingBin", "dtBins", "PART", "STOCK_BIN")
+F.Data.Dictionary.SetDefaultReturn("dictStockingBin", "")
+F.Data.DataTable.AddColumn("dtJ52", "STOCKING_BIN", "String", "")
+F.Data.DataTable.FillFromDictionary("dtJ52", "dictStockingBin", "PART", "STOCKING_BIN")
+F.Data.Dictionary.Close("dictStockingBin")
+
+F.Data.Dictionary.CreateFromDataTable("dictUM", "dtBins", "PART", "UM")
+F.Data.Dictionary.SetDefaultReturn("dictUM", "")
+F.Data.DataTable.AddColumn("dtJ52", "UM", "String", "")
+F.Data.DataTable.FillFromDictionary("dtJ52", "dictUM", "PART", "UM")
+F.Data.Dictionary.Close("dictUM")
+
+F.Data.Dictionary.CreateFromDataTable("dictDescription", "dtBins", "PART", "DESCRIPTION")
+F.Data.Dictionary.SetDefaultReturn("dictDescription", "")
+F.Data.DataTable.AddColumn("dtJ52", "DESCRIPTION", "String", "")
+F.Data.DataTable.FillFromDictionary("dtJ52", "dictDescription", "PART", "DESCRIPTION")
+F.Data.Dictionary.Close("dictDescription")
+
+F.Data.Dictionary.CreateFromDataTable("dictDescription2", "dtBins", "PART", "DESCRIPTION_2")
+F.Data.Dictionary.SetDefaultReturn("dictDescription2", "")
+F.Data.DataTable.AddColumn("dtJ52", "DESCRIPTION_2", "String", "")
+F.Data.DataTable.FillFromDictionary("dtJ52", "dictDescription2", "PART", "DESCRIPTION_2")
+F.Data.Dictionary.Close("dictDescription2")
+
+F.Data.Dictionary.CreateFromDataTable("dictDescription3", "dtBins", "PART", "DESCRIPTION_3")
+F.Data.Dictionary.SetDefaultReturn("dictDescription3", "")
+F.Data.DataTable.AddColumn("dtJ52", "DESCRIPTION_3", "String", "")
+F.Data.DataTable.FillFromDictionary("dtJ52", "dictDescription3", "PART", "DESCRIPTION_3")
+F.Data.Dictionary.Close("dictDescription3")
+
+F.Data.Dictionary.CreateFromDataTable("dictEXTRA", "dtBins", "PART", "EXTRA_TEXT")
+F.Data.Dictionary.SetDefaultReturn("dictEXTRA", "")
+F.Data.DataTable.AddColumn("dtJ52", "EXTRA_TEXT", "String", "")
+F.Data.DataTable.FillFromDictionary("dtJ52", "dictEXTRA", "PART", "EXTRA_TEXT")
+F.Data.Dictionary.Close("dictEXTRA")
+
+F.Data.Dictionary.CreateFromDataTable("dictFlagLot", "dtBins", "PART", "FLAG_LOT")
+F.Data.Dictionary.SetDefaultReturn("dictFlagLot", "")
+F.Data.DataTable.AddColumn("dtJ52", "FLAG_LOT", "String", "")
+F.Data.DataTable.FillFromDictionary("dtJ52", "dictFlagLot", "PART", "FLAG_LOT")
+F.Data.Dictionary.Close("dictFlagLot")
+
+F.Data.Dictionary.CreateFromDataTable("dictPL", "dtBins", "PART", "PRODUCT_LINE")
+F.Data.Dictionary.SetDefaultReturn("dictPL", "")
+F.Data.DataTable.AddColumn("dtJ52", "PRODUCT_LINE", "String", "")
+F.Data.DataTable.FillFromDictionary("dtJ52", "dictPL", "PART", "PRODUCT_LINE")
+F.Data.Dictionary.Close("dictPL")
+
+F.Data.Dictionary.CreateFromDataTable("dictCPP", "dtBins", "PART", "CNTNRS_PER_PALLET")
+F.Data.Dictionary.SetDefaultReturn("dictCPP", "")
+F.Data.DataTable.AddColumn("dtJ52", "CNTNRS_PER_PALLET", "String", "")
+F.Data.DataTable.FillFromDictionary("dtJ52", "dictCPP", "PART", "CNTNRS_PER_PALLET")
+F.Data.Dictionary.Close("dictCPP")
+
+'added 02/15/24
+F.Data.Dictionary.CreateFromDataTable("dictPCSpercarton", "dtBins", "PART", "PCS_PER_CNTNR")
+F.Data.Dictionary.SetDefaultReturn("dictPCSpercarton", 0)
+F.Data.DataTable.AddColumn("dtJ52", "PCS_PER_CNTNR", "float", 0)
+F.Data.DataTable.FillFromDictionary("dtJ52", "dictPCSpercarton", "PART", "PCS_PER_CNTNR")
+F.Data.Dictionary.Close("dictPCSpercarton")
+
+F.Data.DataTable.Close("dtBins")
+
+'add columns to gather additional WO information
+F.Data.DataTable.AddColumn("dtJ52", "WIP_BAL", "Float", 0)
+F.Data.DataTable.AddColumn("dtJ52", "WO_QTY_BAL", "Float", 0)
+F.Data.DataTable.AddColumn("dtJ52", "BIN_OPTION", "String", "")
+F.Data.DataTable.AddColumn("dtJ52", "OVERRIDE_LABEL_QUANTITY", "Boolean", False)
+F.Data.DataTable.AddColumn("dtJ52", "Close", "String", "")
+F.Data.DataTable.AddColumn("dtJ52", "EXTENDED_QUANTITY", "Float", 0)
+
+F.Intrinsic.String.Build("select RTRIM(JOB) + '-' + RTRIM(SUFFIX) JS, SUM(AMT_LABOR+AMT_MATERIAL+AMT_OVERHEAD+OTHER)+AMT_PARTIAL_SHPMNT AS WIP_BAL,(QTY_ORDER-QTY_COMPLETED-{1}) AS WO_QTY_BAL from V_JOB_HEADER WHERE JS = '{0}' GROUP BY JOB, SUFFIX,AMT_PARTIAL_SHPMNT,QTY_ORDER,QTY_COMPLETED",V.DataTable.dtJ52(V.Local.iCounter).JS!FieldValTrim , V.DataTable.dtJ52(V.Local.iCounter).QTY!FieldValTrim, V.Local.sSQL)
+F.Data.DataTable.CreateFromSQL("dtWIPBal", "Con", V.Local.sSQL)
+'if WO exists in active job file
+F.Intrinsic.Control.If(V.DataTable.dtWIPBal.RowCount,>,0)
+	F.Data.Dictionary.CreateFromDataTable("dictWIPBal", "dtWIPBal", "JS", "WIP_BAL")
+	F.Data.Dictionary.SetDefaultReturn("dictWIPBal", "")
+	'F.Data.DataTable.AddColumn("dtJ52", "WIP_BAL", "Float", 0)
+	F.Data.DataTable.FillFromDictionary("dtJ52", "dictWIPBal", "JS", "WIP_BAL")
+	F.Data.Dictionary.Close("dictWIPBal")
+	
+	F.Data.Dictionary.CreateFromDataTable("dictWOQTYBal", "dtWIPBal", "JS", "WO_QTY_BAL")
+	F.Data.Dictionary.SetDefaultReturn("dictWOQTYBal", "")
+	'F.Data.DataTable.AddColumn("dtJ52", "WO_QTY_BAL", "Float", 0)
+	F.Data.DataTable.FillFromDictionary("dtJ52", "dictWOQTYBal", "JS", "WO_QTY_BAL")
+	F.Data.Dictionary.Close("dictWOQTYBal")
+	
+	F.Data.DataTable.Close("dtWIPBal")
+	
+	'F.Data.DataTable.AddColumn("dtJ52", "BIN_OPTION", "String", "")
+	'F.Data.DataTable.AddColumn("dtJ52", "OVERRIDE_LABEL_QUANTITY", "Boolean", False)
+	'F.Data.DataTable.AddColumn("dtJ52", "Close", "String", "")
+	
+	'override label quantity with WO remaining quantity option
+	F.Intrinsic.Control.For(V.Local.iCounter, 0, V.DataTable.dtJ52.RowCount--, 1)
+		F.Intrinsic.String.Split(V.DataTable.dtJ52(V.Local.iCounter).EXTRA_OPTION!FieldValTrim, "!@#$#@!", V.Local.sExtraOption)
+		F.Data.DataTable.SetValue("dtJ52", V.Local.iCounter, "BIN_OPTION", V.Local.sExtraOption(0))
+		F.Intrinsic.Control.If(V.Local.sExtraOption.UBound, >, 0)
+			F.Data.DataTable.SetValue("dtJ52", V.Local.iCounter, "Close", V.Local.sExtraOption(1))
+		F.Intrinsic.Control.EndIf
+	F.Intrinsic.Control.Next(V.Local.iCounter)
+	V.Local.sExtraOption.Redim(0, 0)
+	
+	'F.Data.DataTable.AddExpressionColumn("dtJ52", "FINAL_BIN", "String", "IIF([BIN_OPTION] = 'DEFAULT', [DEFAULT_BIN], IIF([BIN_OPTION] = 'STOCKING', [STOCKING_BIN], [TOBIN]))")
+	
+	'if mobile form bin is not blank then use the form bin else use options defined for bin in maintenance
+	'F.Data.DataTable.AddExpressionColumn("dtJ52", "FINAL_BIN", "String", "IIF([TOBIN] <> '', [TOBIN], IIF([BIN_OPTION] = 'STOCKING', [STOCKING_BIN], [DEFAULT_BIN]))")
+	
+	'calculate quantities if the same WO is processed more than once
+	F.Data.DataView.Create("dtJ52", "dvJ52Quantity", 22)
+	F.Data.DataView.ToDataTableDistinct("dtJ52", "dvJ52Quantity", "dtJ52Distinct", "JS")
+	'F.Data.DataTable.AddColumn("dtJ52", "EXTENDED_QUANTITY", "Float", 0)
+	F.Intrinsic.Control.For(V.Local.iCounter, 0, V.DataTable.dtJ52Distinct.RowCount--, 1)
+		F.Intrinsic.String.Build("[JS] = '{0}'", V.DataTable.dtJ52Distinct(V.Local.iCounter).JS!FieldValTrim, V.Local.sFilter)
+		F.Data.DataView.SetFilter("dtJ52", "dvJ52Quantity", V.Local.sFilter)
+		
+		V.Local.fSum.Set(0)
+		F.Intrinsic.Control.For(V.Local.iDataViewCounter, 0, V.DataView.dtJ52!dvJ52Quantity.RowCount--, 1)
+			F.Intrinsic.Math.Add(V.Local.fSum, V.DataView.dtJ52!dvJ52Quantity(V.Local.iDataViewCounter).QTY!FieldValFloat, V.Local.fSum)
+			F.Data.DataView.SetValue("dtJ52", "dvJ52Quantity", V.Local.iDataViewCounter, "EXTENDED_QUANTITY", V.Local.fSum)
+		F.Intrinsic.Control.Next(V.Local.iDataViewCounter)
+	F.Intrinsic.Control.Next(V.Local.iCounter)
+	F.Data.DataTable.Close("dtJ52Distinct")
+	F.Data.DataView.Close("dtJ52", "dvJ52Quantity")
+	
+	'set the close flag based on the option, and the quantity on the WO
+	'F.Data.DataTable.AddExpressionColumn("dtJ52", "COMPLETE", "String", "IIF([CLOSE] = 'Always Close', 'Y', IIF([CLOSE] = 'Do Not Close', 'N', IIF([CLOSE] = 'When Run Quantity is Completed', IIF([OPEN] <= [EXTENDED_QUANTITY], 'Y', 'N'), 'N')))")
+	'F.Data.DataTable.AddExpressionColumn("dtJ52", "COMPLETE", "String", "IIF([CLOSE] = 'Always Close', 'Y', IIF([CLOSE] = 'Do Not Close', 'N', IIF([MANUALCLOSE]= 'on','Y', IIF([CLOSE] = 'When Run Quantity is Completed', IIF([OPEN] <= [EXTENDED_QUANTITY], 'Y', 'N'), 'N'))))")
+	
+F.Intrinsic.Control.EndIf
+
+	'if mobile form bin is not blank then use the form bin else use options defined for bin in maintenance
+	F.Data.DataTable.AddExpressionColumn("dtJ52", "FINAL_BIN", "String", "IIF([TOBIN] <> '', [TOBIN], IIF([BIN_OPTION] = 'STOCKING', [STOCKING_BIN], [DEFAULT_BIN]))")
+
+	F.Data.DataTable.AddExpressionColumn("dtJ52", "COMPLETE", "String", "IIF([CLOSE] = 'Always Close', 'Y', IIF([MANUALCLOSE]= 'on','Y', IIF([CLOSE] = 'Do Not Close', 'N', IIF([CLOSE] = 'When Run Quantity is Completed', IIF([OPEN] <= [EXTENDED_QUANTITY], 'Y', 'N'), 'N'))))")
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",v.Caller.ScriptFile,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+F.Intrinsic.Control.EndTry
+Program.Sub.LoadMobileJ52Data.End
+
+Program.Sub.ProcessMobileJ52Transactions.Start
+F.Intrinsic.Control.Try
+V.Local.sError.Declare
+
+V.Local.iCounter.Declare(Long)
+V.Local.sLot.Declare(String, "")
+V.Local.iCostMethod.Declare(Long)
+V.Local.sCostMethod.Declare(String, "")
+V.Local.sFinalCostMethod.Declare(String)
+V.Local.sSQL.Declare(String)
+V.Local.bLot.Declare(Boolean, False)
+V.Local.sResults.Declare(String)
+V.Local.sHeat.Declare(String, "")
+V.Local.irolls.Declare(Long)
+v.Local.ipalletrolls.Declare(Long)
+v.Local.scurrentpallet.Declare(String)
+v.Local.snextpallet.Declare(String)
+v.Local.snewjobsuffix.Declare(String)
+V.Local.sRet.Declare(String)
+V.Local.fThickness.Declare(float)
+V.Local.fBF.Declare(float)
+v.Local.fBFperPc.Declare(float)
+v.Local.stempResults.Declare(String)
+v.Local.ilots.Declare(long)
+v.Local.fUnitBF.Declare(float)
+V.Local.bIsNumeric.Declare(Boolean, False)
+v.Local.sCWreturn1.Declare(String)
+v.Local.sCWreturn2.Declare(String)
+v.Local.sJobSuffix.Declare(String)
+V.Local.PriorMethod.Declare(String)
+v.Local.fcartonlabelcount.Declare(Float)
+v.Local.fpartialcartonqty.Declare(Float)
+v.Local.iLen.Declare(long)
+
+F.Intrinsic.Control.If(V.DataTable.dtJ52.Exists, =, False)
+	F.Intrinsic.Control.ExitSub
+F.Intrinsic.Control.EndIf
+
+'check if job is valid
+F.Data.Dictionary.CreateFromSQL("dictJobs", "Con", "select RTRIM(JOB) + '-' + RTRIM(SUFFIX), Cast(1 as bit) from V_JOB_HEADER where DATE_CLOSED = '1900-01-01'")
+F.Data.DataTable.AddColumn("dtJ52", "VALID_WORK_ORDER", "Boolean", False)
+F.Data.Dictionary.SetDefaultReturn("dictJobs", False)
+F.Data.DataTable.FillFromDictionary("dtJ52", "dictJobs", "JS", "VALID_WORK_ORDER")
+F.Data.Dictionary.Close("dictJobs")
+
+'check if wo is locked
+F.Intrinsic.String.Build("select RTRIM(REC_KEY), Cast(1 as Bit) from V_X_LOCK_FILE where COMPANY = '{0}' and LOCK_TYPE = 'WO'", V.Caller.CompanyCode, V.Local.sSQL)
+F.Data.Dictionary.CreateFromSQL("dictLocked", "Con", V.Local.sSQL)
+F.Data.Dictionary.SetDefaultReturn("dictLocked", False)
+F.Data.DataTable.AddColumn("dtJ52", "LOCKED", "Boolean", False)
+F.Data.DataTable.FillFromDictionary("dtJ52", "dictLocked", "JS", "LOCKED")
+F.Data.Dictionary.Close("dictLocked")
+
+'check if wo is flagged for lot to lot tracking 4/21/23
+F.Intrinsic.String.Build("select RTRIM(JOB) + '-' + RTRIM(SUFFIX), Cast(1 as bit) from V_JOB_HEADER where LOT_TO_LOT = 'Y'", V.Caller.CompanyCode, V.Local.sSQL)
+F.Data.Dictionary.CreateFromSQL("dictlottolot", "Con", V.Local.sSQL)
+F.Data.Dictionary.SetDefaultReturn("dictlottolot", False)
+F.Data.DataTable.AddColumn("dtJ52", "LOT_TO_LOT", "Boolean", False)
+F.Data.DataTable.FillFromDictionary("dtJ52", "dictlottolot", "JS", "LOT_TO_LOT")
+F.Data.Dictionary.Close("dictlottolot")
+
+F.Data.DataTable.AddColumn("dtJ52", "FAIL_REASON", "String", "")
+'check open WO
+F.Data.DataView.Create("dtJ52", "dvValid", 22, "[FAIL_REASON] = '' and [VALID_WORK_ORDER] = False", "")
+F.Data.DataView.SetValue("dtJ52", "dvValid", -1, "FAIL_REASON", "No valid open work order found.")
+
+'Check Highland Hardwoods/Boyce Highlands for input for width and length
+
+f.Intrinsic.Control.If(V.Datatable.dtJ52(V.Local.iCounter).FIELD_LOT!FIELDVALTRIM,=,"Calc-HIH")
+'	F.Data.DataView.SetFilter("dtJ52", "dvValid", "[FAIL_REASON] = '' and [QTY] = 0 OR [USERFIELD1] = '' OR [USERFIELD2] = ''")
+'	F.Data.DataView.SetValue("dtJ52", "dvValid", -1, "FAIL_REASON", "Pcs, Width and Length must be inputted, try again.")
+
+Function.Intrinsic.Debug.Stop
+
+	'added logic 2/21/23
+	'check for flag set to use Pcs as total BF
+	F.Data.DataTable.AddColumn("dtJ52", "USE_PCS_BF", "Boolean", false)
+	f.Intrinsic.Control.If(V.DataTable.dtJ52(V.Local.iCounter).FIELD_9!FIELDVALTRIM,=,"on")
+		F.Data.Datatable.SetValue("dtJ52", v.Local.iCounter, "USE_PCS_BF",true)
+	f.Intrinsic.Control.EndIf
+	f.Intrinsic.Control.If(V.DataTable.dtJ52(V.Local.iCounter).USE_PCS_BF!FIELDVALTRIM,<>,True)
+		F.Data.DataTable.AddColumn("dtJ52", "SIZE_NUMERIC", "Boolean", true)
+		F.Intrinsic.Math.IsNumeric(V.DataTable.dtJ52(V.Local.iCounter).USERFIELD1!FIELDVALTRIM,v.Local.bisnumeric)
+		f.Intrinsic.Control.If(v.Local.bIsNumeric,=,false)	
+			F.Data.Datatable.SetValue("dtJ52", v.Local.iCounter, "SIZE_NUMERIC",false)
+			F.Data.DataView.SetFilter("dtJ52", "dvValid", "[SIZE_NUMERIC] = false")
+			F.Data.DataView.SetValue("dtJ52", "dvValid", -1, "FAIL_REASON", "Length must be numeric, try again.")
+		f.Intrinsic.Control.EndIf
+		F.Intrinsic.Math.IsNumeric(V.DataTable.dtJ52(V.Local.iCounter).USERFIELD2!FIELDVALTRIM,v.Local.bisnumeric)
+		f.Intrinsic.Control.If(v.Local.bIsNumeric,=,false)	
+			F.Data.Datatable.SetValue("dtJ52", v.Local.iCounter, "SIZE_NUMERIC",false)
+			F.Data.DataView.SetFilter("dtJ52", "dvValid", "[SIZE_NUMERIC] = false")
+			F.Data.DataView.SetValue("dtJ52", "dvValid", -1, "FAIL_REASON", "Width must be numeric, try again.")
+		f.Intrinsic.Control.EndIf
+	f.Intrinsic.Control.EndIf
+'	Function.Intrinsic.Debug.InvokeDebugger
+	
+	'Added logic 1/20/23	
+	'check if substitute part is entered and if part is valid
+	F.Data.DataTable.AddColumn("dtJ52", "PART_SUB_VALID", "Boolean", true)
+	F.Data.DataTable.AddColumn("dtJ52", "PART_DESCR_SUB", "String","")
+	F.Data.DataTable.AddColumn("dtJ52", "PART_SUB", "String", V.DataTable.dtJ52(V.Local.iCounter).FIELD_7!FIELDVALTRIM)
+	f.Intrinsic.Control.If(V.DataTable.dtJ52(V.Local.iCounter).PART_SUB!FIELDVALTRIM,<>,"")
+		F.Intrinsic.String.Build("select PART,DESCRIPTION from INVENTORY_MSTR where PART = '{0}' and LOCATION = '{1}'", V.DataTable.dtJ52(V.Local.iCounter).PART_SUB!FIELDVALTRIM, V.DataTable.dtJ52(V.Local.iCounter).LOCATION!FIELDVALTRIM, V.Local.sSQL)
+		Function.ODBC.Connection!Con.OpenRecordsetRO("rstsubpart",V.Local.sSQL)
+			F.Intrinsic.Control.If(V.ODBC.Con!rstsubpart.EOF,=,True)
+				F.Data.Datatable.SetValue("dtJ52", v.Local.iCounter, "PART_SUB_VALID",false)				
+				F.Data.DataView.SetFilter("dtJ52", "dvValid", "[PART_SUB_VALID] = false")
+				F.Data.DataView.SetValue("dtJ52", "dvValid", -1, "FAIL_REASON", "Substitute Part is not in inventory master.")
+			F.Intrinsic.Control.Else
+				F.Data.Datatable.SetValue("dtJ52", v.Local.iCounter, "PART_DESCR_SUB",V.ODBC.Con!rstsubpart.FieldValTrim!DESCRIPTION)
+			F.Intrinsic.Control.EndIf
+			F.ODBC.Con!rstsubpart.Close	
+	f.Intrinsic.Control.EndIf
+f.Intrinsic.Control.Else
+	F.Data.DataTable.AddColumn("dtJ52", "PART_DESCR_SUB", "String","")
+	F.Data.DataTable.AddColumn("dtJ52", "PART_SUB", "String","")
+f.Intrinsic.Control.EndIf	
+
+'validate bin input exists in bin master for matching location code
+F.Data.DataTable.AddColumn("dtJ52", "BIN_VALID", "Boolean", true)
+F.Intrinsic.String.Build("select BIN FROM V_BIN_MASTER where BIN = '{0}' and LOCATION = '{1}'", V.DataTable.dtJ52(V.Local.iCounter).FINAL_BIN!FIELDVALTRIM, V.DataTable.dtJ52(V.Local.iCounter).LOCATION!FIELDVALTRIM, V.Local.sSQL)
+Function.ODBC.Connection!Con.OpenRecordsetRO("rstBIN",V.Local.sSQL)
+F.Intrinsic.Control.If(V.ODBC.Con!rstBIN.EOF,=,True)
+	F.Data.Datatable.SetValue("dtJ52", v.Local.iCounter, "BIN_VALID",false)
+	F.Data.DataView.SetFilter("dtJ52", "dvValid", "[BIN_VALID] = false")
+	F.Data.DataView.SetValue("dtJ52", "dvValid", -1, "FAIL_REASON", "Invalid Bin.")
+F.Intrinsic.Control.EndIf
+F.ODBC.Con!rstBIN.Close	
+		
+'check quantity
+F.Data.DataView.SetFilter("dtJ52", "dvValid", "[FAIL_REASON] = '' and [QTY] = 0")
+F.Data.DataView.SetValue("dtJ52", "dvValid", -1, "FAIL_REASON", "Quantity of 0 passed.")
+
+'check WIP Balance $ - 04-25-23 Added exception for M-Industries
+F.Data.DataView.SetFilter("dtJ52", "dvValid", "[FAIL_REASON] = '' and [WIP_BAL] < .01 and [COMPLETE]<>'Y' and [FIELD_LOT]<> 'Calc-MIN'")
+F.Data.DataView.SetValue("dtJ52", "dvValid", -1, "FAIL_REASON", "WIP Balance <= $0, can not proceed. Check Close box and try again or issue material/apply labor.")
+
+'check WO lock status
+F.Data.DataView.SetFilter("dtJ52", "dvValid", "[FAIL_REASON] = '' and [LOCKED] = True")
+F.Data.DataView.SetValue("dtJ52", "dvValid", -1, "FAIL_REASON", "Work order is locked because it is open.  Close out of WO and retry.")
+'F.Data.DataView.SetFilter("dtJ52", "dvValid", "[FAIL_REASON] = 'Work order was locked because it is open. Skipping this record for now...' and [LOCKED] = True")
+F.Data.DataView.ToDataTable("dtJ52", "dvValid", "dtSaveLockedJ52")
+F.Data.DataTable.AddColumn("dtSaveLockedJ52", "PROCESSED", "STRING", "L")
+F.Data.DataTable.Close("dtSaveLockedJ52")
+
+'read the SS > Company Options (Standard) > Inventory Accounting Options > Display Inventory Cost Update Screen in WIP to FG
+F.Global.General.ReadOption(402288, 0, False, V.Local.bLot)
+F.Data.DataTable.AddColumn("dtJ52", "DISPLAY_COST_SCREEN", "Boolean", V.Local.bLot)
+F.Data.DataView.SetFilter("dtJ52", "dvValid", "[FAIL_REASON] = '' and [DISPLAY_COST_SCREEN] = True")
+F.Data.DataView.SetValue("dtJ52", "dvValid", -1, "FAIL_REASON", "Need to turn off this option: SS > Company Options (Standard) > Inventory Accounting Options > Display Inventory Cost Update Screen in WIP to FG")
+
+'read SS > Company Options (Standard) > Inventory > Do Not Allow Blank Bin on Lot/Bin Records
+F.Global.General.ReadOption(401185, 0, False, V.Local.bLot)
+F.Data.DataTable.AddColumn("dtJ52", "NO_BLANK_BIN", "Boolean", V.Local.bLot)
+F.Data.DataView.SetFilter("dtJ52", "dvValid", "[FAIL_REASON] = '' and [TOBIN] = '' and [NO_BLANK_BIN] = True")
+F.Data.DataView.SetValue("dtJ52", "dvValid", -1, "FAIL_REASON", "Blank Bin not allowed")
+
+'read Serial flag on WO header
+'not currently supported on mobile
+F.Data.Dictionary.CreateFromSQL("dictserialize", "Con", "select RTRIM(JOB) + '-' + RTRIM(SUFFIX), Cast(1 as bit) from V_JOB_HEADER where FLAG_SERIALIZE = 'Y'")
+F.Data.DataTable.AddColumn("dtJ52", "FLAG_SERIALIZE", "Boolean", False)
+F.Data.Dictionary.SetDefaultReturn("dictserialize", False)
+F.Data.DataTable.FillFromDictionary("dtJ52", "dictserialize", "JS", "FLAG_SERIALIZE")
+F.Data.Dictionary.Close("dictserialize")
+F.Data.DataView.SetFilter("dtJ52", "dvValid", "[FAIL_REASON] = '' and [FLAG_SERIALIZE] = True")
+F.Data.DataView.SetValue("dtJ52", "dvValid", -1, "FAIL_REASON", "WO is flagged for Serialization and not currently supported on GS Mobile.")
+
+'read SS > Company Options (Advanced) > Manufacturing > Allow Jobs to be Closed if Level 1 Component Work Orders Are Not Closed
+F.Global.General.ReadOption(402631, 0, False, V.Local.bLot)
+F.Data.DataTable.AddColumn("dtJ52", "ALLOW_OPEN_CHILDREN", "Boolean", V.Local.bLot)
+
+'Check parent WO for open children when closed
+F.Data.DataView.SetFilter("dtJ52", "dvValid", "[FAIL_REASON] = '' and [CHILD_OPEN] = 'Y' and [ALLOW_OPEN_CHILDREN] = False and [COMPLETE] = 'Y'")
+F.Data.DataView.SetValue("dtJ52", "dvValid", -1, "FAIL_REASON", "Not all level 1 child work orders are closed.  This parent work order can not be closed.")
+
+'Check WO for open material sequences when closed
+F.Data.DataView.SetFilter("dtJ52", "dvValid", "[FAIL_REASON] = '' and [MATL_OPEN] = 'Y' and [COMPLETE] = 'Y'")
+F.Data.DataView.SetValue("dtJ52", "dvValid", -1, "FAIL_REASON", "Open Material Commitments.  Issue material or close out open material before transferring WIP to FG.")
+
+Function.Intrinsic.Debug.Stop
+
+'Check for WO flagged as Lot-to-lot 4/21/23
+F.Data.DataView.SetFilter("dtJ52", "dvValid", "[FAIL_REASON] = '' and [LOT_TO_LOT] = TRUE")
+F.Data.DataView.SetValue("dtJ52", "dvValid", -1, "FAIL_REASON", "WO is flagged for lot to lot tracking which is not supported for mobile WIP to FG.")
+
+'return result to mobile page
+F.Data.DataView.SetFilter("dtJ52", "dvValid", "[FAIL_REASON] <> ''")
+F.Data.DataView.ToDataTable("dtJ52", "dvValid", "dtreturnresult")
+F.Intrinsic.Control.If(V.DataTable.dtreturnresult.RowCount, >, 0)
+
+	F.Intrinsic.String.Build("<tr><td style=color:Red;font-weight:bold;><center><mark>FAILED</mark>: WO {0}-{1} for Qty {3}; {2}",V.DataView.dtJ52!dvValid(0).JOB!FieldVal,V.DataView.dtJ52!dvValid(0).SUFFIX!FieldVal,V.DataView.dtJ52!dvValid(0).FAIL_REASON!FieldVal,V.DataView.dtJ52!dvValid(0).QTY!FieldVal,v.Local.sResults)
+	F.Global.Mobile.setcustomresult(v.Caller.CompanyCode,V.DataView.dtJ52!dvValid(0).TRANS_ID!FieldVal,v.Local.sResults)
+	'F.Global.Mobile.setcustomresult(v.Caller.CompanyCode,V.DataView.dtJ52!dvValid(0).TRANS_ID!FieldVal,V.DataView.dtJ52!dvValid(0).FAIL_REASON!FieldVal)
+F.Intrinsic.Control.EndIf
+F.Data.DataTable.Close("dtreturnresult")
+
+'Process after passing test
+F.Data.DataView.SetFilter("dtJ52", "dvValid", "IsNull([FAIL_REASON], '') = ''")
+
+
+'build blank dt for labels
+F.Data.DataTable.CreateFromSQL("dtLabel", "Con", "Select * From Y_SF_WIPTOFG where WO = ''", True)
+F.Data.DataTable.AddColumn("dtLabel", "Printer", "String", "")
+F.Data.DataTable.AddColumn("dtLabel", "LABEL_COPY", "String", "")
+F.Data.DataTable.AddColumn("dtLabel", "USERFIELD1", "String", "")
+F.Data.DataTable.AddColumn("dtLabel", "USERFIELD2", "String", "")
+F.Data.DataTable.AddColumn("dtLabel", "USERFIELD3", "String", "")
+F.Data.DataTable.AddColumn("dtLabel", "USERFIELD4", "String", "")
+F.Data.DataTable.AddColumn("dtLabel", "USERFIELD5", "String", "")
+F.Data.DataTable.AddColumn("dtLabel", "USERFIELD6", "String", "")
+F.Data.DataTable.AddColumn("dtLabel", "USERFIELD7", "String", "")
+F.Data.DataTable.AddColumn("dtLabel", "USERFIELD8", "String", "")
+F.Data.DataTable.AddColumn("dtLabel", "USERFIELD9", "String", "")
+'F.Data.DataTable.AddColumn("dtLabel", "PRODUCT_LINE", "String", "")
+F.Data.DataTable.AddColumn("dtLabel", "DESCRIPTION_2", "String", "")
+F.Data.DataTable.AddColumn("dtLabel", "DESCRIPTION_3", "String", "")
+F.Data.DataTable.AddColumn("dtLabel", "EXTRA_TEXT", "String", "")
+F.Data.DataTable.AddColumn("dtLabel", "PART_SUB", "String", "")
+F.Data.DataTable.AddColumn("dtLabel", "PART_DESCR_SUB", "String", "")
+F.Data.DataTable.AddColumn("dtLabel", "DEFAULT_BIN", "String", "")
+
+F.Data.DataTable.DeleteRow("dtLabel", -1)
+F.Data.DataTable.AcceptChanges("dtLabel")
+
+F.Global.General.ReadOption(401163, 3, 0, V.Local.iCostMethod)
+F.Intrinsic.Control.SelectCase(V.Local.iCostMethod)
+	F.Intrinsic.Control.Case(1)
+		V.Local.sCostMethod.Set("P")
+	F.Intrinsic.Control.Case(2)
+		V.Local.sCostMethod.Set("E")
+	F.Intrinsic.Control.Case(3)
+		V.Local.sCostMethod.Set("I")
+	F.Intrinsic.Control.Case(4)
+		V.Local.sCostMethod.Set("A")
+	F.Intrinsic.Control.Case(5)
+		V.Local.sCostMethod.Set("R")
+	F.Intrinsic.Control.Case(6)
+		V.Local.sCostMethod.Set("L")
+F.Intrinsic.Control.EndSelect
+
+F.Intrinsic.Control.For(V.Local.iCounter, 0, V.DataView.dtJ52!dvValid.RowCount--, 1)
+	'added 10/19/23 to validate prior partial method used to check if partial method is A 
+	F.Intrinsic.String.Build("SELECT TOP 1 MAX(DTL_TYPE_FLAG) AS PARTIAL_METHOD, MAX(DATE_SEQUENCE) AS MAX_DATE_SEQUENCE, MAX(TIME_LAST_CHG) AS MAX_TIME_LAST_CHG FROM V_JOB_DETAIL WHERE SEQ = '999999' AND JOB = '{0}' AND SUFFIX = '{1}' AND NEG_WIP_FG_DONE <> 'Y' GROUP BY JOB, SUFFIX, SEQ, DATE_SEQUENCE, TIME_LAST_CHG ORDER BY MAX_DATE_SEQUENCE DESC, MAX_TIME_LAST_CHG DESC;",V.DataView.dtJ52!dvValid(V.Local.iCounter).JOB!FieldValTrim,V.DataView.dtJ52!dvValid(V.Local.iCounter).SUFFIX!FieldValTrim,V.Local.sSQL)
+	F.ODBC.Connection!con.ExecuteAndReturn(V.Local.sSQL, V.Local.sRet)
+	F.Intrinsic.String.Split(v.Local.sRet,*!*,v.Local.sRet)
+		F.Intrinsic.Control.If(V.Local.sRet(0),<>,"")
+			V.Local.PriorMethod.Set(V.Local.sRet(0).RTrim)
+		f.Intrinsic.Control.Else
+			v.Local.PriorMethod.Set("A")
+		F.Intrinsic.Control.EndIf
+	'add to the WIP to FG callwrapper DT
+	F.Intrinsic.Control.If(V.DataView.dtJ52!dvValid(V.Local.iCounter).COMPLETE!FieldValTrim, =, "Y")
+		V.Local.sFinalCostMethod.Set("R")
+	F.Intrinsic.Control.ElseIf(V.DataView.dtJ52!dvValid(V.Local.iCounter).WIP_BAL!FieldValTrim, <=,0, "AND",V.Local.sCostMethod,=,"A")
+		V.Local.sFinalCostMethod.Set("E")
+	F.Intrinsic.Control.ElseIf(V.Local.sCostMethod,=,"A", "AND", V.Local.PriorMethod,<>,"A")
+		V.Local.sFinalCostMethod.Set("E")
+	f.Intrinsic.Control.Else
+		V.Local.sFinalCostMethod.Set(V.Local.sCostMethod)
+	F.Intrinsic.Control.EndIf
+
+'	moved to after building lot/bin DT
+'	F.Data.DataTable.AddRow("2003", "WONum", V.DataView.dtJ52!dvValid(V.Local.iCounter).JOB!FieldValTrim, "WOSuffix", V.DataView.dtJ52!dvValid(V.Local.iCounter).SUFFIX!FieldValTrim, "CloseWO", V.DataView.dtJ52!dvValid(V.Local.iCounter).COMPLETE!FieldValTrim, "Quantity", V.DataView.dtJ52!dvValid(V.Local.iCounter).QTY!FieldValFloat, "PrintLabels", "N", "CostMethod", V.Local.sFinalCostMethod)
+
+	'if Part is flagged for FLAG_LOT, add lot/bin records			
+	F.Intrinsic.Control.If(V.DataView.dtJ52!dvValid(V.Local.iCounter).FLAG_LOT!FieldValTrim, =, "Y")
+	
+	
+		'check if lot is blank at this point from mobile form input
+		F.Intrinsic.Control.If(V.DataView.dtJ52!dvValid(V.Local.iCounter).LOT!FieldValTrim, =, "")
+			'if field_lot is CALC-MIN then determine next roll number for M_Industries roll stock PL=RS
+			F.Intrinsic.Control.SelectCase(V.DataView.dtJ52!dvValid(V.Local.iCounter).FIELD_LOT!FIELDVALTRIM)
+			F.Intrinsic.Control.CaseAny("CALC-MIN","Calc-MIN")
+				F.Intrinsic.Control.SelectCase(V.DataView.dtJ52!dvValid(V.Local.iCounter).PRODUCT_LINE!FIELDVALTRIM)
+				F.Intrinsic.Control.Case("RS")
+					'find last roll number used
+					F.Intrinsic.String.build("select top 1 lot from ITEM_HISTORY where job = '{0}' and suffix = '{1}' and code_transaction = 'J52' group by job, suffix, lot having sum(quantity)<>0 order by lot desc",V.DataView.dtJ52!dvValid(V.Local.iCounter).JOB!FieldValTrim,V.DataView.dtJ52!dvValid(V.Local.iCounter).SUFFIX!FieldValTrim,V.Local.sSQL)
+						Function.ODBC.Connection!Con.OpenRecordsetRO("rstitemhistory",V.Local.sSQL)
+					F.Intrinsic.Control.If(V.ODBC.Con!rstitemhistory.EOF,=,False)
+						f.Intrinsic.String.Split(V.ODBC.Con!rstitemhistory.FieldValTrim!Lot,"-",v.Local.sLot)
+						'set next roll number for lot
+						f.Intrinsic.Math.Add(v.Local.sLot(1),1,v.Local.irolls)
+						f.Intrinsic.String.LPad(v.Local.irolls,"0",3,v.Local.snewjobsuffix)
+						f.Intrinsic.String.Build("{0}-{1}",V.DataView.dtJ52!dvValid(V.Local.iCounter).JOB!FieldValTrim,v.Local.snewjobsuffix,v.Local.sLot)
+						F.Data.DataTable.SetValue("dtJ52", V.Local.iCounter, "LOT", V.Local.sLot)
+					f.Intrinsic.Control.Else
+						v.Local.irolls.Set(0)
+						'set next roll number for lot
+						f.Intrinsic.Math.Add(v.Local.irolls,1,v.Local.irolls)
+						f.Intrinsic.String.LPad(v.Local.irolls,"0",3,v.Local.snewjobsuffix)
+						f.Intrinsic.String.Build("{0}-{1}",V.DataView.dtJ52!dvValid(V.Local.iCounter).JOB!FieldValTrim,v.Local.snewjobsuffix,v.Local.sLot)
+						F.Data.DataTable.SetValue("dtJ52", V.Local.iCounter, "LOT", V.Local.sLot)
+					F.Intrinsic.Control.EndIf			
+					F.ODBC.Con!rstitemhistory.Close
+				F.Intrinsic.Control.EndSelect
+				
+			'if field_lot is CALC-HIH then determine next lot number (sub-lot) for Highland Hardwoods (Boyce Highland)
+			F.Intrinsic.Control.CaseAny("CALC-HIH","Calc-HIH")	
+					'find last lot-suffix used
+					F.Intrinsic.Control.If(V.DataView.dtJ52!dvValid(V.Local.iCounter).FIELD_2!FieldValTrim,<>,"")
+						'dont print label
+						F.Data.DataTable.SetValue("dtJ52", V.Local.iCounter, "PRINTER", "")
+						F.Intrinsic.String.build("select top 1 I.lot from ITEM_HISTORY I left outer join ITEM_HIST_USR U ON I.PART=U.PART AND I.LOCATION=U.LOCN AND I.DATE_HISTORY=U.KEY_DATE AND I.TIME_ITEM_HISTORY=U.KEY_TIME where I.job = '{0}' and I.suffix = '{1}' and I.code_transaction = 'J52' and U.USR_FIELD_3 = '{2}' group by I.job, I.suffix, I.lot having sum(I.quantity)<>0 order by I.lot desc",V.DataView.dtJ52!dvValid(V.Local.iCounter).JOB!FieldValTrim,V.DataView.dtJ52!dvValid(V.Local.iCounter).SUFFIX!FieldValTrim,V.DataView.dtJ52!dvValid(V.Local.iCounter).FIELD_2!FieldValTrim,V.Local.sSQL)
+							Function.ODBC.Connection!Con.OpenRecordsetRO("rstitemhistory",V.Local.sSQL)
+						F.Intrinsic.Control.If(V.ODBC.Con!rstitemhistory.EOF,=,False)
+							f.Intrinsic.String.Split(V.ODBC.Con!rstitemhistory.FieldValTrim!Lot,"-",v.Local.sLot)
+							'set next lot-suffix for lot
+							f.Intrinsic.Math.Add(v.Local.sLot(1),1,v.Local.irolls)
+							f.Intrinsic.String.LPad(v.Local.irolls,"0",2,v.Local.snewjobsuffix)
+							f.Intrinsic.String.Build("{0}-{1}",V.DataView.dtJ52!dvValid(V.Local.iCounter).FIELD_2!FieldValTrim,v.Local.snewjobsuffix,v.Local.sLot)
+							F.Data.DataTable.SetValue("dtJ52", V.Local.iCounter, "LOT", V.Local.sLot)							
+						f.Intrinsic.Control.Else
+							v.Local.irolls.Set(0)
+							'set next suffix for lot
+							f.Intrinsic.Math.Add(v.Local.irolls,1,v.Local.irolls)
+							f.Intrinsic.String.LPad(v.Local.irolls,"0",2,v.Local.snewjobsuffix)
+							f.Intrinsic.String.Build("{0}-{1}",V.DataView.dtJ52!dvValid(V.Local.iCounter).FIELD_2!FieldValTrim,v.Local.snewjobsuffix,v.Local.sLot)
+							F.Data.DataTable.SetValue("dtJ52", V.Local.iCounter, "LOT", V.Local.sLot)
+						F.Intrinsic.Control.EndIf			
+						F.ODBC.Con!rstitemhistory.Close	
+						F.Data.Datatable.SetValue("dtJ52", v.Local.iCounter, "USERFIELD3", V.DataView.dtJ52!dvValid(V.Local.iCounter).FIELD_2!FieldValTrim)
+						'added 2/21/23
+						Function.Intrinsic.Debug.Stop
+						
+						F.Intrinsic.Control.If(V.DataView.dtJ52!dvValid(V.Local.iCounter).Use_Pcs_BF!FieldValTrim,<>, True)
+							'calculate quantity, user field 3 and user field 7									
+							'calculate BF 
+							'get the thickness value from inventory master
+							F.Intrinsic.String.Build("SELECT THICKNESS FROM V_INVENTORY_MST3 WHERE PART = '{0}' AND LOCATION = '{1}'", V.DataView.dtJ52!dvValid(V.Local.iCounter).PART!FieldValTrim, V.DataView.dtJ52!dvValid(V.Local.iCounter).LOCATION!FieldValTrim, V.Local.sSQL)
+							F.ODBC.Connection!con.ExecuteAndReturn(V.Local.sSQL, V.Local.sRet)
+							F.Intrinsic.Control.If(V.Local.sRet,<>,"")
+								V.Local.fThickness.Set(V.Local.sRet.Float)
+							F.Intrinsic.Control.Else
+								V.Local.fThickness.Set(1)
+							F.Intrinsic.Control.EndIf
+							'calculate BF per Pc
+							f.Intrinsic.Math.mult(v.Local.fThickness,V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD1!FieldValTrim,V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD2!FieldValTrim,1,V.Local.fBFperPc)
+							F.Intrinsic.Math.Div(V.Local.fBFperPc,12,V.Local.fBFperPc)
+							f.Intrinsic.Math.Round(v.Local.fBFperPc, 0, v.Local.fBFperPc)												
+							F.Data.Datatable.SetValue("dtJ52", v.Local.iCounter, "USERFIELD7", v.Local.fBFperPc)
+							'calculate BF
+							f.Intrinsic.Math.Mult(v.Local.fBFperPc,V.DataView.dtJ52!dvValid(V.Local.iCounter).QTY!FieldValTrim,v.Local.fBF)
+							F.Data.Datatable.SetValue("dtJ52", v.Local.iCounter, "QTY", V.Local.fBF)
+						f.Intrinsic.Control.Else
+							'leave PCS as Qty for Total BF
+						f.Intrinsic.Control.EndIf
+						'added 1/20/23
+						'check for input for alternate sort part number
+						f.Intrinsic.Control.If(V.DataView.dtJ52!dvValid(V.Local.iCounter).PART_SUB!FieldValTrim,<>,"")
+							'F.Data.Datatable.SetValue("dtJ52", v.Local.iCounter, "PART", V.DataView.dtJ52!dvValid(V.Local.iCounter).PART_SUB!FieldValTrim)							
+							f.Intrinsic.String.Build("UPDATE JOB_HEADER SET PART = '{0}' WHERE JOB = '{1}' AND SUFFIX = '{2}'",V.DataView.dtJ52!dvValid(V.Local.iCounter).PART_SUB!FieldValTrim,V.DataView.dtJ52!dvValid(V.Local.iCounter).JOB!FieldValTrim,V.DataView.dtJ52!dvValid(V.Local.iCounter).SUFFIX!FieldValTrim,V.Local.sSQL)
+							F.ODBC.Connection!con.Execute(V.Local.sSQL)
+						F.Intrinsic.Control.EndIf
+					F.Intrinsic.Control.Else
+						v.Local.irolls.Set(0)
+						'set next suffix for lot
+						f.Intrinsic.Math.Add(v.Local.irolls,1,v.Local.irolls)
+						f.Intrinsic.String.LPad(v.Local.irolls,"0",2,v.Local.snewjobsuffix)
+						f.Intrinsic.String.Build("{0}-{1}",V.DataView.dtJ52!dvValid(V.Local.iCounter).AUTO_LOT_NUMBER!FieldValTrim,v.Local.snewjobsuffix,v.Local.sLot)
+						F.Data.DataTable.SetValue("dtJ52", V.Local.iCounter, "LOT", V.Local.sLot)
+						F.Data.Datatable.SetValue("dtJ52", v.Local.iCounter, "USERFIELD3", V.DataView.dtJ52!dvValid(V.Local.iCounter).AUTO_LOT_NUMBER!FieldValTrim)
+						'added 2/21/23
+						Function.Intrinsic.Debug.Stop
+						F.Intrinsic.Control.If(V.DataView.dtJ52!dvValid(V.Local.iCounter).Use_Pcs_BF!FieldValTrim,<>, True)
+							'calculate quantity, user field 3 and user field 7
+							
+							'calculate BF 
+							'get the thickness value from inventory master
+							F.Intrinsic.String.Build("SELECT THICKNESS FROM V_INVENTORY_MST3 WHERE PART = '{0}' AND LOCATION = '{1}'", V.DataView.dtJ52!dvValid(V.Local.iCounter).PART!FieldValTrim, V.DataView.dtJ52!dvValid(V.Local.iCounter).LOCATION!FieldValTrim, V.Local.sSQL)
+							F.ODBC.Connection!con.ExecuteAndReturn(V.Local.sSQL, V.Local.sRet)
+							F.Intrinsic.Control.If(V.Local.sRet,<>,"")
+								V.Local.fThickness.Set(V.Local.sRet.Float)
+							F.Intrinsic.Control.Else
+								V.Local.fThickness.Set(1)
+							F.Intrinsic.Control.EndIf
+							'calculate BF per Pc
+							f.Intrinsic.Math.mult(v.Local.fThickness,V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD1!FieldValTrim,V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD2!FieldValTrim,1,V.Local.fBFperPc)
+							F.Intrinsic.Math.Div(V.Local.fBFperPc,12,V.Local.fBFperPc)
+							f.Intrinsic.Math.Round(v.Local.fBFperPc, 0, v.Local.fBFperPc)
+							F.Data.Datatable.SetValue("dtJ52", v.Local.iCounter, "USERFIELD7", v.Local.fBFperPc)
+							'calculate BF
+							f.Intrinsic.Math.Mult(v.Local.fBFperPc,V.DataView.dtJ52!dvValid(V.Local.iCounter).QTY!FieldValTrim,v.Local.fBF)
+							F.Data.Datatable.SetValue("dtJ52", v.Local.iCounter, "QTY", V.Local.fBF)
+						f.Intrinsic.Control.Else
+							'leave PCS as Qty for Total BF
+						f.Intrinsic.Control.EndIf
+						'check for input for alternate sort part number
+						f.Intrinsic.Control.If(V.DataView.dtJ52!dvValid(V.Local.iCounter).PART_SUB!FieldValTrim,<>,"")
+							'F.Data.Datatable.SetValue("dtJ52", v.Local.iCounter, "PART", V.DataView.dtJ52!dvValid(V.Local.iCounter).PART_SUB!FieldValTrim)							
+							f.Intrinsic.String.Build("UPDATE JOB_HEADER SET PART = '{0}' WHERE JOB = '{1}' AND SUFFIX = '{2}'",V.DataView.dtJ52!dvValid(V.Local.iCounter).PART_SUB!FieldValTrim,V.DataView.dtJ52!dvValid(V.Local.iCounter).JOB!FieldValTrim,V.DataView.dtJ52!dvValid(V.Local.iCounter).SUFFIX!FieldValTrim,V.Local.sSQL)
+							F.ODBC.Connection!con.Execute(V.Local.sSQL)
+						F.Intrinsic.Control.EndIf
+					F.Intrinsic.Control.EndIf				
+			F.Intrinsic.Control.CaseElse
+					'if they have the option on to use JOB-SUFFIX as lot, do that
+					F.Intrinsic.Control.If(V.DataView.dtJ52!dvValid(V.Local.iCounter).USE_JOB_SUFFIX_AS_LOT!FieldVal)
+						F.Intrinsic.Control.If(V.DataView.dtJ52!dvValid(V.Local.iCounter).SUFFIX!FieldValTrim, =, "")
+							V.Local.sLot.Set(V.DataView.dtJ52!dvValid(V.Local.iCounter).JOB!FieldValTrim)
+						F.Intrinsic.Control.Else
+							F.Intrinsic.String.Build("{0}-{1}", V.DataView.dtJ52!dvValid(V.Local.iCounter).JOB!FieldValTrim, V.DataView.dtJ52!dvValid(V.Local.iCounter).SUFFIX!FieldValTrim, V.Local.sLot)
+						F.Intrinsic.Control.EndIf
+					'if they have the option on to use adv inventory auto lot, use that
+					F.Intrinsic.Control.ElseIf(V.DataView.dtJ52!dvValid(V.Local.iCounter).USE_AUTO_LOT!FieldVal)
+						f.Intrinsic.String.Len(V.DataView.dtJ52!dvValid(V.Local.iCounter).AUTO_LOT_NUMBER!FieldValLong,v.Local.iLen)
+						f.Intrinsic.Control.If(v.Local.iLen,<,6)						
+							F.Intrinsic.String.LPad(V.DataView.dtJ52!dvValid(V.Local.iCounter).AUTO_LOT_NUMBER!FieldValLong, "0", 6, V.Local.sLot)
+						f.Intrinsic.Control.Else
+							v.Local.sLot.Set(V.DataView.dtJ52!dvValid(V.Local.iCounter).AUTO_LOT_NUMBER!FieldValLong)
+						f.Intrinsic.Control.EndIf
+					F.Intrinsic.Control.Else
+						V.Local.sLot.Set("")			
+					F.Intrinsic.Control.EndIf
+					F.Data.DataTable.SetValue("dtJ52", V.Local.iCounter, "LOT", V.Local.sLot)
+			F.Intrinsic.Control.EndSelect
+		F.Intrinsic.Control.EndIf
+		
+		'check if heat is blank at this point from mobile form input
+		F.Intrinsic.Control.If(V.DataView.dtJ52!dvValid(V.Local.iCounter).HEAT!FieldValTrim, =, "")
+			'if field_heat is CALC-MIN then determine next pallet # for M_Industries roll stock PL=RS
+			F.Intrinsic.Control.SelectCase(V.DataView.dtJ52!dvValid(V.Local.iCounter).FIELD_HEAT!FIELDVALTRIM)
+			F.Intrinsic.Control.CaseAny("CALC-MIN","Calc-MIN")
+				F.Intrinsic.Control.SelectCase(V.DataView.dtJ52!dvValid(V.Local.iCounter).PRODUCT_LINE!FIELDVALTRIM)
+				F.Intrinsic.Control.Case("RS")
+					'find current pallet # and total rolls currently assigned to it
+					F.Intrinsic.String.build("select top 1 heat from ITEM_HISTORY where job = '{0}' and suffix = '{1}' and code_transaction = 'J52' group by job, suffix, heat having sum(quantity)<>0 order by heat desc",V.DataView.dtJ52!dvValid(V.Local.iCounter).JOB!FieldValTrim,V.DataView.dtJ52!dvValid(V.Local.iCounter).SUFFIX!FieldValTrim,V.Local.sSQL)
+						Function.ODBC.Connection!Con.OpenRecordsetRO("rstitemhistory",V.Local.sSQL)
+					F.Intrinsic.Control.If(V.ODBC.Con!rstitemhistory.EOF,=,False)
+					
+						'get roll count on current pallet
+						
+'						F.Intrinsic.String.build("select count(*) as Rolls from ITEM_HISTORY where job = '{0}' and suffix = '{1}' and heat = '{2}' and code_transaction = 'J52' group by job, suffix, heat having sum(quantity)<>0 order by heat desc",V.DataView.dtJ52!dvValid(V.Local.iCounter).JOB!FieldValTrim,V.DataView.dtJ52!dvValid(V.Local.iCounter).SUFFIX!FieldValTrim,V.ODBC.Con!rstitemhistory.FieldValTrim!Heat,V.Local.sSQL)
+'						Function.ODBC.Connection!Con.OpenRecordsetRO("rstrollcount",V.Local.sSQL)
+'						F.Intrinsic.Control.If(V.ODBC.Con!rstrollcount.EOF,=,False)
+'							v.Local.ipalletrolls.Set(V.ODBC.Con!rstrollcount.FieldValTrim!Rolls)
+
+						F.Intrinsic.String.build("select distinct lot from ITEM_HISTORY where job = '{0}' and suffix = '{1}' and heat = '{2}' and code_transaction = 'J52' group by job, suffix, heat, lot having sum(quantity)<>0 order by heat desc",V.DataView.dtJ52!dvValid(V.Local.iCounter).JOB!FieldValTrim,V.DataView.dtJ52!dvValid(V.Local.iCounter).SUFFIX!FieldValTrim,V.ODBC.Con!rstitemhistory.FieldValTrim!Heat,V.Local.sSQL)
+						f.Data.Datatable.CreateFromSQL("Rolls","Con",v.Local.sSQL)						
+						v.Local.ipalletrolls.Set(v.DataTable.Rolls.RowCount)
+						f.Data.Datatable.Close("Rolls")
+						
+'						F.Intrinsic.Control.EndIf
+'						F.ODBC.Con!rstrollcount.Close
+
+						F.Intrinsic.String.Split(V.ODBC.Con!rstitemhistory.FieldValTrim!Heat,"-",v.Local.sHeat)
+						'current pallet
+						
+						v.Local.scurrentpallet.Set(v.Local.sHeat(1))
+							f.Intrinsic.Control.If(v.Local.ipalletrolls,<,V.DataView.dtJ52!dvValid(V.Local.iCounter).CNTNRS_PER_PALLET!FIELDVALTRIM)
+								f.Intrinsic.String.LPad(v.Local.scurrentpallet,"0",2,v.Local.scurrentpallet)
+								F.Intrinsic.String.Build("F{0}-{1}", V.DataView.dtJ52!dvValid(V.Local.iCounter).JOB!FieldValTrim, v.Local.scurrentpallet, V.Local.sHeat)
+								F.Data.DataTable.SetValue("dtJ52", V.Local.iCounter, "HEAT", V.Local.sHeat)
+							f.Intrinsic.Control.Else
+								f.Intrinsic.Math.Add(v.Local.scurrentpallet,1,v.Local.snextpallet)
+								f.Intrinsic.String.LPad(v.Local.snextpallet,"0",2,v.Local.snextpallet)
+								F.Intrinsic.String.Build("F{0}-{1}", V.DataView.dtJ52!dvValid(V.Local.iCounter).JOB!FieldValTrim, v.Local.snextpallet, V.Local.sHeat)
+								F.Data.DataTable.SetValue("dtJ52", V.Local.iCounter, "HEAT", V.Local.sHeat)
+							f.Intrinsic.Control.EndIf					
+					F.Intrinsic.Control.Else
+						F.Intrinsic.String.Build("F{0}-{1}", V.DataView.dtJ52!dvValid(V.Local.iCounter).JOB!FieldValTrim, "01", V.Local.sHeat)	
+						F.Data.DataTable.SetValue("dtJ52", V.Local.iCounter, "HEAT", V.Local.sHeat)
+					F.Intrinsic.Control.EndIf
+					F.ODBC.Con!rstitemhistory.Close					
+				F.Intrinsic.Control.EndSelect		
+			F.Intrinsic.Control.EndSelect		
+		F.Intrinsic.Control.EndIf
+		
+		'add to the WIP to FG callwrapper lot/bin DT
+		F.Data.DataTable.AddRow("2003File", "WONum", V.DataView.dtJ52!dvValid(V.Local.iCounter).JOB!FieldValTrim, "WOSuffix", V.DataView.dtJ52!dvValid(V.Local.iCounter).SUFFIX!FieldValTrim, "Bin", V.DataView.dtJ52!dvValid(V.Local.iCounter).FINAL_BIN!FieldValTrim, "SpecificQuantity", V.DataView.dtJ52!dvValid(V.Local.iCounter).QTY!FieldValFloat, "LOT", V.DataView.dtJ52!dvValid(V.Local.iCounter).LOT!FieldValTrim, "HEAT", V.DataView.dtJ52!dvValid(V.Local.iCounter).HEAT!FieldValTrim, "SERIAL", V.DataView.dtJ52!dvValid(V.Local.iCounter).SERIAL!FieldValTrim, "USERFIELD1", V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD1!FieldValTrim, "USERFIELD2", V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD2!FieldValTrim, "USERFIELD3", V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD3!FieldValTrim, "USERFIELD4", V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD4!FieldValTrim, "USERFIELD5", V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD5!FieldValTrim, "USERFIELD6", V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD6!FieldValTrim, "USERFIELD7", V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD7!FieldValTrim, "USERFIELD8", V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD8!FieldValTrim, "USERFIELD9", V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD9!FieldValTrim)
+
+	F.Intrinsic.Control.EndIf
+	
+	'Add to the WIP to FG callwrapper header DT
+	F.Data.DataTable.AddRow("2003", "WONum", V.DataView.dtJ52!dvValid(V.Local.iCounter).JOB!FieldValTrim, "WOSuffix", V.DataView.dtJ52!dvValid(V.Local.iCounter).SUFFIX!FieldValTrim, "CloseWO", V.DataView.dtJ52!dvValid(V.Local.iCounter).COMPLETE!FieldValTrim, "Quantity", V.DataView.dtJ52!dvValid(V.Local.iCounter).QTY!FieldValFloat, "PrintLabels", "N", "CostMethod", V.Local.sFinalCostMethod)
+	'Function.Intrinsic.Debug.InvokeDebugger
+	Function.Intrinsic.Debug.Stop
+	
+	'process return result and run WIP to FG callwrapper
+	F.Intrinsic.Control.If(V.DataView.dtJ52!dvValid(V.Local.iCounter).FIELD_LOT!FieldValTrim,=,"Calc-MIN","OR",V.DataView.dtJ52!dvValid(V.Local.iCounter).FIELD_HEAT!FieldValTrim,=,"Calc-MIN")	
+		'process WIP to FG callwrapper
+		F.Intrinsic.Control.CallSub(2003Sync,"TransID",v.Global.sTransID)
+		'check if return code is successful (0)		
+		Function.Intrinsic.Debug.Stop		
+		f.Intrinsic.String.Split(Variable.Ambient.CallWrapperReturn,"*!*RETURN::",v.Local.sCWreturn1)
+		f.Intrinsic.String.Split(v.Local.sCWreturn1(1),"*!*",v.Local.sCWreturn2)
+		f.Intrinsic.Control.If(v.Local.sCWreturn2(0),=,0)
+			F.Intrinsic.String.Build("<tr><td style=color:Green;font-weight:bold;><center><mark>Successful</mark>: WO {0}-{1} processed for Qty {2} | Lot: {3} Heat: {4} | Open Qty {7} | WO Closed? [{8}]",V.DataView.dtJ52!dvValid(V.Local.iCounter).JOB!FieldVal,V.DataView.dtJ52!dvValid(V.Local.iCounter).SUFFIX!FieldVal,V.DataView.dtJ52!dvValid(V.Local.iCounter).QTY!FieldVal,V.DataView.dtJ52!dvValid(V.Local.iCounter).LOT!FieldVal,V.DataView.dtJ52!dvValid(V.Local.iCounter).HEAT!FieldVal,V.DataView.dtJ52!dvValid(V.Local.iCounter).FINAL_BIN!FieldVal,V.DataView.dtJ52!dvValid(V.Local.iCounter).SERIAL!FieldVal,V.DataView.dtJ52!dvValid(V.Local.iCounter).WO_QTY_BAL!FieldVal,V.DataView.dtJ52!dvValid(V.Local.iCounter).COMPLETE!FieldVal,v.Local.sResults)
+			'display successfult result message
+			F.Global.Mobile.setcustomresult(v.Caller.CompanyCode,V.DataView.dtJ52!dvValid(0).TRANS_ID!FieldVal,v.Local.sResults)
+		f.Intrinsic.Control.Else
+			Function.Intrinsic.Debug.Stop			
+			'display failed result message
+			v.Local.sResults.Set(v.Local.sCWreturn2(1))
+			F.Intrinsic.String.Build("<tr><td style=color:Red;font-weight:bold;><center><mark>FAILED</mark>: WO {0}-{1} for Qty {3}; {2}",V.DataView.dtJ52!dvValid(0).JOB!FieldVal,V.DataView.dtJ52!dvValid(0).SUFFIX!FieldVal,v.Local.sResults,V.DataView.dtJ52!dvValid(0).QTY!FieldVal,v.Local.sResults)
+			F.Global.Mobile.setcustomresult(v.Caller.CompanyCode,V.DataView.dtJ52!dvValid(0).TRANS_ID!FieldVal,v.Local.sResults)
+			'remove the WO in use flag
+			f.Intrinsic.String.Build("{0}-{1}",V.DataView.dtJ52!dvValid(V.Local.iCounter).JOB!FieldValTrim,V.DataView.dtJ52!dvValid(V.Local.iCounter).SUFFIX!FieldValTrim,V.Local.sJobSuffix)
+			Function.Global.General.DestroySoftLock("WO",V.Local.sJobSuffix,V.Local.sRet)
+			f.Intrinsic.Control.CallSub(Exit)
+		f.Intrinsic.Control.EndIf
+	F.Intrinsic.Control.ElseIf(V.DataView.dtJ52!dvValid(V.Local.iCounter).FIELD_LOT!FieldValTrim,=,"Calc-HIH") 
+		'process WIP to FG callwrapper
+		F.Intrinsic.Control.CallSub(2003Sync,"TransID",v.Global.sTransID)		
+		'check if return code is successful (0)		
+		Function.Intrinsic.Debug.Stop		
+		f.Intrinsic.String.Split(Variable.Ambient.CallWrapperReturn,"*!*RETURN::",v.Local.sCWreturn1)
+		f.Intrinsic.String.Split(v.Local.sCWreturn1(1),"*!*",v.Local.sCWreturn2)
+		f.Intrinsic.Control.If(v.Local.sCWreturn2(0),=,0)		
+			F.Intrinsic.String.Build("select A.PART,A.LOCATION,B.DESCRIPTION AS DESCR,A.LOT,A.BIN,A.QUANTITY,CAST(A.QUANTITY AS NUMERIC(10,2)) AS QTY,A.USER_FIELD_1,A.USER_FIELD_2,A.USER_FIELD_3,CAST(A.USER_FIELD_7 AS NUMERIC(10,2)) AS USER_FIELD_7,A.USER_FIELD_4,A.PO_NUMBER AS PO,C.VENDOR,D.NAME_VENDOR,rtrim(A.USER_FIELD_2)+' x '+rtrim(A.USER_FIELD_1) AS SIZE,CASE WHEN A.QUANTITY <1 OR RTRIM(A.USER_FIELD_7) = '' THEN 0 ELSE CAST(A.QUANTITY/CAST(A.USER_FIELD_7 AS NUMERIC(10,6)) AS NUMERIC(10,0)) END AS PCS from V_ITEM_MASTER A LEFT OUTER JOIN V_INVENTORY_ALL B ON A.PART=B.PART AND A.LOCATION=B.LOCATION LEFT OUTER JOIN V_PO_HEADER C ON A.PO_NUMBER=C.PURCHASE_ORDER LEFT OUTER JOIN V_VENDOR_MASTER D ON C.VENDOR=D.VENDOR WHERE A.USER_FIELD_3 = '{0}' AND QUANTITY > 0 ORDER BY LOT",V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD3!FieldValTrim,v.Local.sSQL)
+			F.data.DataTable.CreateFromSQL("LabelTemp1","con",v.Local.sSQL)
+			F.Intrinsic.String.Build("select COUNT(*) AS LOTS from V_ITEM_MASTER WHERE USER_FIELD_3 = '{0}' AND QUANTITY > 0 ",V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD3!FieldValTrim,v.Local.sSQL)
+			F.ODBC.Connection!con.ExecuteAndReturn(v.Local.sSQL, v.Local.ilots)
+			F.Intrinsic.String.Build("select sum(quantity) AS BF from V_ITEM_MASTER WHERE USER_FIELD_3 = '{0}' AND QUANTITY > 0 ",V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD3!FieldValTrim,v.Local.sSQL)
+			F.ODBC.Connection!con.ExecuteAndReturn(v.Local.sSQL, v.Local.fUnitBF)		
+			'set form title
+			F.Intrinsic.String.Build("<tr><td style=color:Green;font-weight:bold;><center><mark>SUCCESSFUL</mark>: WO {1}-{2} Unit Number {0} || lot count {3} || BF total {4}</tr></td></center>",V.DataView.dtJ52!dvValid(V.Local.iCounter).userfield3!FieldValTrim,V.DataView.dtJ52!dvValid(V.Local.iCounter).JOB!FieldValTrim,V.DataView.dtJ52!dvValid(V.Local.iCounter).SUFFIX!FieldValTrim,v.Local.ilots,v.Local.fUnitBF,v.Local.stempResults)
+			'build html table
+			f.data.datatable.exportHTML("LabelTemp1","LOT*!*PART*!*BIN*!*SIZE*!*USER_FIELD_7*!*PCS*!*QTY","Lot*!*Part*!*Bin*!*Size*!*BF/Pc*!*Pcs*!*Qty","t01",true,v.Local.sResults)
+			F.INTRINSIC.STRING.BUILD("<!DOCTYPE html><html><style>table {  width:100%;}table, td {  height: 15px; font-size: 11px; border: 1px solid black;  border-collapse: collapse;}table#t01 tr:nth-child(even) {  background-color: #D3D3D3;}table#t01 tr:nth-child(odd) { background-color: #FFFFFF;}table#t01 th {  background-color: #95C26C;  color: black;}</style><body>{0}</body></html>",V.Local.sResults,V.Local.sResults)
+			f.Intrinsic.String.Concat(v.Local.stempResults,v.Local.sResults,v.Local.sResults)
+			F.Intrinsic.String.Concat("<table cellpadding = "0" cellspacing="1" border = "1">",V.local.sresults,V.Local.sResults)
+			F.Global.Mobile.setcustomresult(v.Caller.CompanyCode,v.Global.sTransID,v.Local.sResults)	
+			F.Data.DataTable.Close("LabelTemp1")
+			'display successfult result message
+			F.Global.Mobile.setcustomresult(v.Caller.CompanyCode,V.DataView.dtJ52!dvValid(0).TRANS_ID!FieldVal,v.Local.sResults)
+			'if substitite part change WO back
+			f.Intrinsic.Control.If(V.DataView.dtJ52!dvValid(V.Local.iCounter).PART_SUB!FieldValTrim,<>,"")
+				F.Intrinsic.String.Build("UPDATE JOB_HEADER SET PART = '{0}' WHERE JOB = '{1}' AND SUFFIX = '{2}'",V.DataView.dtJ52!dvValid(V.Local.iCounter).PART!FieldValTrim,V.DataView.dtJ52!dvValid(V.Local.iCounter).JOB!FieldValTrim,V.DataView.dtJ52!dvValid(V.Local.iCounter).SUFFIX!FieldValTrim,V.Local.sSQL)
+				F.ODBC.Connection!con.Execute(V.Local.sSQL)
+				F.Intrinsic.String.Build("UPDATE INVENTORY_MSTR SET QTY_ONORDER_WO = QTY_ONORDER_WO-{2} WHERE PART = '{0}' AND LOCATION = '{1}'",V.DataView.dtJ52!dvValid(V.Local.iCounter).PART!FieldValTrim,V.DataView.dtJ52!dvValid(V.Local.iCounter).LOCATION!FieldValTrim,V.DataView.dtJ52!dvValid(V.Local.iCounter).QTY!FieldValTrim,V.Local.sSQL)
+				F.ODBC.Connection!con.Execute(V.Local.sSQL)			
+			f.Intrinsic.Control.EndIf
+		f.Intrinsic.Control.Else
+			Function.Intrinsic.Debug.Stop			
+			'display failed result message
+			v.Local.sResults.Set(v.Local.sCWreturn2(1))
+			F.Intrinsic.String.Build("<tr><td style=color:Red;font-weight:bold;><center><mark>FAILED</mark>: WO {0}-{1} for Qty {3}; {2}",V.DataView.dtJ52!dvValid(0).JOB!FieldVal,V.DataView.dtJ52!dvValid(0).SUFFIX!FieldVal,v.Local.sResults,V.DataView.dtJ52!dvValid(0).QTY!FieldVal,v.Local.sResults)
+			F.Global.Mobile.setcustomresult(v.Caller.CompanyCode,V.DataView.dtJ52!dvValid(0).TRANS_ID!FieldVal,v.Local.sResults)
+			'remove the WO in use flag
+			f.Intrinsic.String.Build("{0}-{1}",V.DataView.dtJ52!dvValid(V.Local.iCounter).JOB!FieldValTrim,V.DataView.dtJ52!dvValid(V.Local.iCounter).SUFFIX!FieldValTrim,V.Local.sJobSuffix)
+			Function.Global.General.DestroySoftLock("WO",V.Local.sJobSuffix,V.Local.sRet)
+			f.Intrinsic.Control.CallSub(Exit)
+		f.Intrinsic.Control.EndIf
+	F.Intrinsic.Control.Else
+		'process WIP to FG callwrapper
+		F.Intrinsic.Control.CallSub(2003Sync,"TransID",v.Global.sTransID)
+		'check if return code is successful (0)	
+		f.Intrinsic.String.Split(Variable.Ambient.CallWrapperReturn,"*!*RETURN::",v.Local.sCWreturn1)
+		f.Intrinsic.String.Split(v.Local.sCWreturn1(1),"*!*",v.Local.sCWreturn2)
+		f.Intrinsic.Control.If(v.Local.sCWreturn2(0),=,0)		
+			F.Intrinsic.String.Build("<tr><td style=color:Green;font-weight:bold;><center><mark>Successful</mark>: WO {0}-{1} processed for Qty {2} | L/B/H/S: {3}/{5}/{4}/{6} | Open Qty {7} | WO Closed? [{8}]",V.DataView.dtJ52!dvValid(V.Local.iCounter).JOB!FieldVal,V.DataView.dtJ52!dvValid(V.Local.iCounter).SUFFIX!FieldVal,V.DataView.dtJ52!dvValid(V.Local.iCounter).QTY!FieldVal,V.DataView.dtJ52!dvValid(V.Local.iCounter).LOT!FieldVal,V.DataView.dtJ52!dvValid(V.Local.iCounter).HEAT!FieldVal,V.DataView.dtJ52!dvValid(V.Local.iCounter).FINAL_BIN!FieldVal,V.DataView.dtJ52!dvValid(V.Local.iCounter).SERIAL!FieldVal,V.DataView.dtJ52!dvValid(V.Local.iCounter).WO_QTY_BAL!FieldVal,V.DataView.dtJ52!dvValid(V.Local.iCounter).COMPLETE!FieldVal,v.Local.sResults)
+			'display successfult result message
+			F.Global.Mobile.setcustomresult(v.Caller.CompanyCode,V.DataView.dtJ52!dvValid(0).TRANS_ID!FieldVal,v.Local.sResults)
+		f.Intrinsic.Control.else
+			Function.Intrinsic.Debug.Stop			
+			'display failed result message
+			v.Local.sResults.Set(v.Local.sCWreturn2(1))
+			F.Intrinsic.String.Build("<tr><td style=color:Red;font-weight:bold;><center><mark>FAILED</mark>: WO {0}-{1} for Qty {3}; {2}",V.DataView.dtJ52!dvValid(0).JOB!FieldVal,V.DataView.dtJ52!dvValid(0).SUFFIX!FieldVal,v.Local.sResults,V.DataView.dtJ52!dvValid(0).QTY!FieldVal,v.Local.sResults)
+			F.Global.Mobile.setcustomresult(v.Caller.CompanyCode,V.DataView.dtJ52!dvValid(0).TRANS_ID!FieldVal,v.Local.sResults)
+			'remove the WO in use flag
+			f.Intrinsic.String.Build("{0}-{1}",V.DataView.dtJ52!dvValid(V.Local.iCounter).JOB!FieldValTrim,V.DataView.dtJ52!dvValid(V.Local.iCounter).SUFFIX!FieldValTrim,V.Local.sJobSuffix)
+			Function.Global.General.DestroySoftLock("WO",V.Local.sJobSuffix,V.Local.sRet)
+			f.Intrinsic.Control.CallSub(Exit)			
+		f.Intrinsic.Control.EndIf
+	F.Intrinsic.Control.EndIf	
+			
+		'need to add label values here
+		F.Intrinsic.Control.If(V.DataView.dtJ52!dvValid(V.Local.iCounter).PRINT_CHAR!FieldValTrim, =, "Y")
+	'---------------------------------
+	'-ADDED 02/15/24
+	'----------------------------------	
+		f.Intrinsic.Control.If(V.DataView.dtJ52!dvValid(V.Local.iCounter).CARTON_LABELS!FieldValTrim,=,True,"AND",V.DataView.dtJ52!dvValid(V.Local.iCounter).LABEL_QTY!FieldValTrim,=,"")
+			f.Intrinsic.Control.If(V.DataView.dtJ52!dvValid(V.Local.iCounter).PCS_PER_CNTNR!FieldValTrim,>,0)
+				F.Intrinsic.Math.Div(V.DataView.dtJ52!dvValid(V.Local.iCounter).QTY!FieldValTrim,V.DataView.dtJ52!dvValid(V.Local.iCounter).PCS_PER_CNTNR!FieldValTrim,v.Local.fcartonlabelcount)
+				f.Intrinsic.String.Split(v.Local.fcartonlabelcount.String,".",v.Local.sRet)	
+				f.Intrinsic.Control.If(v.Local.sRet(0),>,0)				
+					F.Data.DataTable.AddRow("dtLabel", "QTY_ON_LABEL", V.DataView.dtJ52!dvValid(V.Local.iCounter).PCS_PER_CNTNR!FieldValTrim, "PART", V.DataView.dtJ52!dvValid(V.Local.iCounter).PART!FieldValTrim, "INV_QTY_REC", V.DataView.dtJ52!dvValid(V.Local.iCounter).QTY!FieldValFloat, "LOT", V.DataView.dtJ52!dvValid(V.Local.iCounter).LOT!FieldValTrim, "HEAT", V.DataView.dtJ52!dvValid(V.Local.iCounter).HEAT!FieldValTrim, "SERIAL", V.DataView.dtJ52!dvValid(V.Local.iCounter).SERIAL!FieldValTrim, "Bin", V.DataView.dtJ52!dvValid(V.Local.iCounter).FINAL_BIN!FieldValTrim, "WO", V.DataView.dtJ52!dvValid(V.Local.iCounter).JOB!FieldValTrim, "WO_SUFFIX", V.DataView.dtJ52!dvValid(V.Local.iCounter).SUFFIX!FieldValTrim, "DESCR", V.DataView.dtJ52!dvValid(V.Local.iCounter).DESCRIPTION!FieldValTrim, "INV_UM", V.DataView.dtJ52!dvValid(V.Local.iCounter).UM!FieldValTrim, "WO_DUE_DATE", V.DataView.dtJ52!dvValid(V.Local.iCounter).DATE_DUE!FieldVal, "PRINTER", V.DataView.dtJ52!dvValid(V.Local.iCounter).PRINTER!FieldValTrim,"LABEL_COPY", v.Local.sRet(0), "USERFIELD1", V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD1!FieldValTrim, "USERFIELD2", V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD2!FieldValTrim, "USERFIELD3", V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD3!FieldValTrim, "USERFIELD4", V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD4!FieldValTrim, "USERFIELD5", V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD5!FieldValTrim, "USERFIELD6", V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD6!FieldValTrim, "USERFIELD7", V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD7!FieldValTrim, "USERFIELD8", V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD8!FieldValTrim, "USERFIELD9", V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD9!FieldValTrim, "PROD_LINE", V.DataView.dtJ52!dvValid(V.Local.iCounter).PRODUCT_LINE!FieldValTrim, "DESCRIPTION_2", V.DataView.dtJ52!dvValid(V.Local.iCounter).DESCRIPTION_2!FieldValTrim, "DESCRIPTION_3", V.DataView.dtJ52!dvValid(V.Local.iCounter).DESCRIPTION_3!FieldValTrim, "EXTRA_TEXT", V.DataView.dtJ52!dvValid(V.Local.iCounter).EXTRA_TEXT!FieldValTrim, "PO_FROM_WO", V.DataView.dtJ52!dvValid(V.Local.iCounter).CUSTOMER_PO!FieldValTrim, "CUST_PART", V.DataView.dtJ52!dvValid(V.Local.iCounter).PART_CUSTOMER!FieldValTrim, "CUSTOMER", V.DataView.dtJ52!dvValid(V.Local.iCounter).CUSTOMER!FieldValTrim, "SO", V.DataView.dtJ52!dvValid(V.Local.iCounter).SALES_ORDER!FieldValTrim, "SO_LINE", V.DataView.dtJ52!dvValid(V.Local.iCounter).SALES_ORDER_LINE!FieldValTrim, "CUSTOMER_NAME", V.DataView.dtJ52!dvValid(V.Local.iCounter).CUSTOMER_NAME!FieldValTrim, "PART_SUB", V.DataView.dtJ52!dvValid(V.Local.iCounter).PART_SUB!FieldValTrim, "PART_DESCR_SUB", V.DataView.dtJ52!dvValid(V.Local.iCounter).PART_DESCR_SUB!FieldValTrim, "DEFAULT_BIN", V.DataView.dtJ52!dvValid(V.Local.iCounter).DEFAULT_BIN!FieldValTrim)
+				f.Intrinsic.Control.EndIf
+				f.Intrinsic.Control.If(v.Local.sRet(1),<>,"OOB")				
+					F.Intrinsic.String.Build(".{0}",V.Local.sRet(1),V.Local.sRet)
+					f.Intrinsic.Math.Mult(v.Local.sRet,V.DataView.dtJ52!dvValid(V.Local.iCounter).PCS_PER_CNTNR!FieldValTrim,v.Local.fpartialcartonqty)
+					F.Data.DataTable.AddRow("dtLabel", "QTY_ON_LABEL", v.Local.fpartialcartonqty, "PART", V.DataView.dtJ52!dvValid(V.Local.iCounter).PART!FieldValTrim, "INV_QTY_REC", V.DataView.dtJ52!dvValid(V.Local.iCounter).QTY!FieldValFloat, "LOT", V.DataView.dtJ52!dvValid(V.Local.iCounter).LOT!FieldValTrim, "HEAT", V.DataView.dtJ52!dvValid(V.Local.iCounter).HEAT!FieldValTrim, "SERIAL", V.DataView.dtJ52!dvValid(V.Local.iCounter).SERIAL!FieldValTrim, "Bin", V.DataView.dtJ52!dvValid(V.Local.iCounter).FINAL_BIN!FieldValTrim, "WO", V.DataView.dtJ52!dvValid(V.Local.iCounter).JOB!FieldValTrim, "WO_SUFFIX", V.DataView.dtJ52!dvValid(V.Local.iCounter).SUFFIX!FieldValTrim, "DESCR", V.DataView.dtJ52!dvValid(V.Local.iCounter).DESCRIPTION!FieldValTrim, "INV_UM", V.DataView.dtJ52!dvValid(V.Local.iCounter).UM!FieldValTrim, "WO_DUE_DATE", V.DataView.dtJ52!dvValid(V.Local.iCounter).DATE_DUE!FieldVal, "PRINTER", V.DataView.dtJ52!dvValid(V.Local.iCounter).PRINTER!FieldValTrim,"LABEL_COPY", 1, "USERFIELD1", V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD1!FieldValTrim, "USERFIELD2", V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD2!FieldValTrim, "USERFIELD3", V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD3!FieldValTrim, "USERFIELD4", V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD4!FieldValTrim, "USERFIELD5", V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD5!FieldValTrim, "USERFIELD6", V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD6!FieldValTrim, "USERFIELD7", V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD7!FieldValTrim, "USERFIELD8", V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD8!FieldValTrim, "USERFIELD9", V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD9!FieldValTrim, "PROD_LINE", V.DataView.dtJ52!dvValid(V.Local.iCounter).PRODUCT_LINE!FieldValTrim, "DESCRIPTION_2", V.DataView.dtJ52!dvValid(V.Local.iCounter).DESCRIPTION_2!FieldValTrim, "DESCRIPTION_3", V.DataView.dtJ52!dvValid(V.Local.iCounter).DESCRIPTION_3!FieldValTrim, "EXTRA_TEXT", V.DataView.dtJ52!dvValid(V.Local.iCounter).EXTRA_TEXT!FieldValTrim, "PO_FROM_WO", V.DataView.dtJ52!dvValid(V.Local.iCounter).CUSTOMER_PO!FieldValTrim, "CUST_PART", V.DataView.dtJ52!dvValid(V.Local.iCounter).PART_CUSTOMER!FieldValTrim, "CUSTOMER", V.DataView.dtJ52!dvValid(V.Local.iCounter).CUSTOMER!FieldValTrim, "SO", V.DataView.dtJ52!dvValid(V.Local.iCounter).SALES_ORDER!FieldValTrim, "SO_LINE", V.DataView.dtJ52!dvValid(V.Local.iCounter).SALES_ORDER_LINE!FieldValTrim, "CUSTOMER_NAME", V.DataView.dtJ52!dvValid(V.Local.iCounter).CUSTOMER_NAME!FieldValTrim, "PART_SUB", V.DataView.dtJ52!dvValid(V.Local.iCounter).PART_SUB!FieldValTrim, "PART_DESCR_SUB", V.DataView.dtJ52!dvValid(V.Local.iCounter).PART_DESCR_SUB!FieldValTrim, "DEFAULT_BIN", V.DataView.dtJ52!dvValid(V.Local.iCounter).DEFAULT_BIN!FieldValTrim)
+				f.Intrinsic.Control.EndIf			
+			F.Intrinsic.Control.Else
+				F.Data.DataTable.AddRow("dtLabel", "QTY_ON_LABEL", V.DataView.dtJ52!dvValid(V.Local.iCounter).QTY!FieldValFloat, "PART", V.DataView.dtJ52!dvValid(V.Local.iCounter).PART!FieldValTrim, "INV_QTY_REC", V.DataView.dtJ52!dvValid(V.Local.iCounter).QTY!FieldValFloat, "LOT", V.DataView.dtJ52!dvValid(V.Local.iCounter).LOT!FieldValTrim, "HEAT", V.DataView.dtJ52!dvValid(V.Local.iCounter).HEAT!FieldValTrim, "SERIAL", V.DataView.dtJ52!dvValid(V.Local.iCounter).SERIAL!FieldValTrim, "Bin", V.DataView.dtJ52!dvValid(V.Local.iCounter).FINAL_BIN!FieldValTrim, "WO", V.DataView.dtJ52!dvValid(V.Local.iCounter).JOB!FieldValTrim, "WO_SUFFIX", V.DataView.dtJ52!dvValid(V.Local.iCounter).SUFFIX!FieldValTrim, "DESCR", V.DataView.dtJ52!dvValid(V.Local.iCounter).DESCRIPTION!FieldValTrim, "INV_UM", V.DataView.dtJ52!dvValid(V.Local.iCounter).UM!FieldValTrim, "WO_DUE_DATE", V.DataView.dtJ52!dvValid(V.Local.iCounter).DATE_DUE!FieldVal, "PRINTER", V.DataView.dtJ52!dvValid(V.Local.iCounter).PRINTER!FieldValTrim,"LABEL_COPY", V.DataView.dtJ52!dvValid(V.Local.iCounter).LABELCOPIES!FieldValTrim, "USERFIELD1", V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD1!FieldValTrim, "USERFIELD2", V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD2!FieldValTrim, "USERFIELD3", V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD3!FieldValTrim, "USERFIELD4", V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD4!FieldValTrim, "USERFIELD5", V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD5!FieldValTrim, "USERFIELD6", V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD6!FieldValTrim, "USERFIELD7", V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD7!FieldValTrim, "USERFIELD8", V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD8!FieldValTrim, "USERFIELD9", V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD9!FieldValTrim, "PROD_LINE", V.DataView.dtJ52!dvValid(V.Local.iCounter).PRODUCT_LINE!FieldValTrim, "DESCRIPTION_2", V.DataView.dtJ52!dvValid(V.Local.iCounter).DESCRIPTION_2!FieldValTrim, "DESCRIPTION_3", V.DataView.dtJ52!dvValid(V.Local.iCounter).DESCRIPTION_3!FieldValTrim, "EXTRA_TEXT", V.DataView.dtJ52!dvValid(V.Local.iCounter).EXTRA_TEXT!FieldValTrim, "PO_FROM_WO", V.DataView.dtJ52!dvValid(V.Local.iCounter).CUSTOMER_PO!FieldValTrim, "CUST_PART", V.DataView.dtJ52!dvValid(V.Local.iCounter).PART_CUSTOMER!FieldValTrim, "CUSTOMER", V.DataView.dtJ52!dvValid(V.Local.iCounter).CUSTOMER!FieldValTrim, "SO", V.DataView.dtJ52!dvValid(V.Local.iCounter).SALES_ORDER!FieldValTrim, "SO_LINE", V.DataView.dtJ52!dvValid(V.Local.iCounter).SALES_ORDER_LINE!FieldValTrim, "CUSTOMER_NAME", V.DataView.dtJ52!dvValid(V.Local.iCounter).CUSTOMER_NAME!FieldValTrim, "PART_SUB", V.DataView.dtJ52!dvValid(V.Local.iCounter).PART_SUB!FieldValTrim, "PART_DESCR_SUB", V.DataView.dtJ52!dvValid(V.Local.iCounter).PART_DESCR_SUB!FieldValTrim, "DEFAULT_BIN", V.DataView.dtJ52!dvValid(V.Local.iCounter).DEFAULT_BIN!FieldValTrim)
+			f.Intrinsic.Control.EndIf
+		F.Intrinsic.Control.elseif(V.DataView.dtJ52!dvValid(V.Local.iCounter).LABEL_QTY!FieldValTrim,>,"0")
+			'CALCULATE QTY/LABELCOPIES
+				F.Intrinsic.Math.Div(V.DataView.dtJ52!dvValid(V.Local.iCounter).QTY!FieldValTrim,V.DataView.dtJ52!dvValid(V.Local.iCounter).LABEL_QTY!FieldValTrim,v.Local.fcartonlabelcount)	
+				F.Data.DataTable.AddRow("dtLabel", "QTY_ON_LABEL", v.Local.fcartonlabelcount, "PART", V.DataView.dtJ52!dvValid(V.Local.iCounter).PART!FieldValTrim, "INV_QTY_REC", V.DataView.dtJ52!dvValid(V.Local.iCounter).QTY!FieldValFloat, "LOT", V.DataView.dtJ52!dvValid(V.Local.iCounter).LOT!FieldValTrim, "HEAT", V.DataView.dtJ52!dvValid(V.Local.iCounter).HEAT!FieldValTrim, "SERIAL", V.DataView.dtJ52!dvValid(V.Local.iCounter).SERIAL!FieldValTrim, "Bin", V.DataView.dtJ52!dvValid(V.Local.iCounter).FINAL_BIN!FieldValTrim, "WO", V.DataView.dtJ52!dvValid(V.Local.iCounter).JOB!FieldValTrim, "WO_SUFFIX", V.DataView.dtJ52!dvValid(V.Local.iCounter).SUFFIX!FieldValTrim, "DESCR", V.DataView.dtJ52!dvValid(V.Local.iCounter).DESCRIPTION!FieldValTrim, "INV_UM", V.DataView.dtJ52!dvValid(V.Local.iCounter).UM!FieldValTrim, "WO_DUE_DATE", V.DataView.dtJ52!dvValid(V.Local.iCounter).DATE_DUE!FieldVal, "PRINTER", V.DataView.dtJ52!dvValid(V.Local.iCounter).PRINTER!FieldValTrim,"LABEL_COPY", V.DataView.dtJ52!dvValid(V.Local.iCounter).LABEL_QTY!FieldValTrim, "USERFIELD1", V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD1!FieldValTrim, "USERFIELD2", V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD2!FieldValTrim, "USERFIELD3", V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD3!FieldValTrim, "USERFIELD4", V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD4!FieldValTrim, "USERFIELD5", V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD5!FieldValTrim, "USERFIELD6", V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD6!FieldValTrim, "USERFIELD7", V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD7!FieldValTrim, "USERFIELD8", V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD8!FieldValTrim, "USERFIELD9", V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD9!FieldValTrim, "PROD_LINE", V.DataView.dtJ52!dvValid(V.Local.iCounter).PRODUCT_LINE!FieldValTrim, "DESCRIPTION_2", V.DataView.dtJ52!dvValid(V.Local.iCounter).DESCRIPTION_2!FieldValTrim, "DESCRIPTION_3", V.DataView.dtJ52!dvValid(V.Local.iCounter).DESCRIPTION_3!FieldValTrim, "EXTRA_TEXT", V.DataView.dtJ52!dvValid(V.Local.iCounter).EXTRA_TEXT!FieldValTrim, "PO_FROM_WO", V.DataView.dtJ52!dvValid(V.Local.iCounter).CUSTOMER_PO!FieldValTrim, "CUST_PART", V.DataView.dtJ52!dvValid(V.Local.iCounter).PART_CUSTOMER!FieldValTrim, "CUSTOMER", V.DataView.dtJ52!dvValid(V.Local.iCounter).CUSTOMER!FieldValTrim, "SO", V.DataView.dtJ52!dvValid(V.Local.iCounter).SALES_ORDER!FieldValTrim, "SO_LINE", V.DataView.dtJ52!dvValid(V.Local.iCounter).SALES_ORDER_LINE!FieldValTrim, "CUSTOMER_NAME", V.DataView.dtJ52!dvValid(V.Local.iCounter).CUSTOMER_NAME!FieldValTrim, "PART_SUB", V.DataView.dtJ52!dvValid(V.Local.iCounter).PART_SUB!FieldValTrim, "PART_DESCR_SUB", V.DataView.dtJ52!dvValid(V.Local.iCounter).PART_DESCR_SUB!FieldValTrim, "DEFAULT_BIN", V.DataView.dtJ52!dvValid(V.Local.iCounter).DEFAULT_BIN!FieldValTrim)
+		F.Intrinsic.Control.Else
+			F.Data.DataTable.AddRow("dtLabel", "QTY_ON_LABEL", V.DataView.dtJ52!dvValid(V.Local.iCounter).QTY!FieldValFloat, "PART", V.DataView.dtJ52!dvValid(V.Local.iCounter).PART!FieldValTrim, "INV_QTY_REC", V.DataView.dtJ52!dvValid(V.Local.iCounter).QTY!FieldValFloat, "LOT", V.DataView.dtJ52!dvValid(V.Local.iCounter).LOT!FieldValTrim, "HEAT", V.DataView.dtJ52!dvValid(V.Local.iCounter).HEAT!FieldValTrim, "SERIAL", V.DataView.dtJ52!dvValid(V.Local.iCounter).SERIAL!FieldValTrim, "Bin", V.DataView.dtJ52!dvValid(V.Local.iCounter).FINAL_BIN!FieldValTrim, "WO", V.DataView.dtJ52!dvValid(V.Local.iCounter).JOB!FieldValTrim, "WO_SUFFIX", V.DataView.dtJ52!dvValid(V.Local.iCounter).SUFFIX!FieldValTrim, "DESCR", V.DataView.dtJ52!dvValid(V.Local.iCounter).DESCRIPTION!FieldValTrim, "INV_UM", V.DataView.dtJ52!dvValid(V.Local.iCounter).UM!FieldValTrim, "WO_DUE_DATE", V.DataView.dtJ52!dvValid(V.Local.iCounter).DATE_DUE!FieldVal, "PRINTER", V.DataView.dtJ52!dvValid(V.Local.iCounter).PRINTER!FieldValTrim,"LABEL_COPY", V.DataView.dtJ52!dvValid(V.Local.iCounter).LABELCOPIES!FieldValTrim, "USERFIELD1", V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD1!FieldValTrim, "USERFIELD2", V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD2!FieldValTrim, "USERFIELD3", V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD3!FieldValTrim, "USERFIELD4", V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD4!FieldValTrim, "USERFIELD5", V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD5!FieldValTrim, "USERFIELD6", V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD6!FieldValTrim, "USERFIELD7", V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD7!FieldValTrim, "USERFIELD8", V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD8!FieldValTrim, "USERFIELD9", V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD9!FieldValTrim, "PROD_LINE", V.DataView.dtJ52!dvValid(V.Local.iCounter).PRODUCT_LINE!FieldValTrim, "DESCRIPTION_2", V.DataView.dtJ52!dvValid(V.Local.iCounter).DESCRIPTION_2!FieldValTrim, "DESCRIPTION_3", V.DataView.dtJ52!dvValid(V.Local.iCounter).DESCRIPTION_3!FieldValTrim, "EXTRA_TEXT", V.DataView.dtJ52!dvValid(V.Local.iCounter).EXTRA_TEXT!FieldValTrim, "PO_FROM_WO", V.DataView.dtJ52!dvValid(V.Local.iCounter).CUSTOMER_PO!FieldValTrim, "CUST_PART", V.DataView.dtJ52!dvValid(V.Local.iCounter).PART_CUSTOMER!FieldValTrim, "CUSTOMER", V.DataView.dtJ52!dvValid(V.Local.iCounter).CUSTOMER!FieldValTrim, "SO", V.DataView.dtJ52!dvValid(V.Local.iCounter).SALES_ORDER!FieldValTrim, "SO_LINE", V.DataView.dtJ52!dvValid(V.Local.iCounter).SALES_ORDER_LINE!FieldValTrim, "CUSTOMER_NAME", V.DataView.dtJ52!dvValid(V.Local.iCounter).CUSTOMER_NAME!FieldValTrim, "PART_SUB", V.DataView.dtJ52!dvValid(V.Local.iCounter).PART_SUB!FieldValTrim, "PART_DESCR_SUB", V.DataView.dtJ52!dvValid(V.Local.iCounter).PART_DESCR_SUB!FieldValTrim, "DEFAULT_BIN", V.DataView.dtJ52!dvValid(V.Local.iCounter).DEFAULT_BIN!FieldValTrim)
+		f.Intrinsic.Control.endif
+'		F.Data.DataTable.AddRow("dtLabel", "QTY_ON_LABEL", V.DataView.dtJ52!dvValid(V.Local.iCounter).QTY!FieldValFloat, "PART", V.DataView.dtJ52!dvValid(V.Local.iCounter).PART!FieldValTrim, "INV_QTY_REC", V.DataView.dtJ52!dvValid(V.Local.iCounter).QTY!FieldValFloat, "LOT", V.DataView.dtJ52!dvValid(V.Local.iCounter).LOT!FieldValTrim, "HEAT", V.DataView.dtJ52!dvValid(V.Local.iCounter).HEAT!FieldValTrim, "SERIAL", V.DataView.dtJ52!dvValid(V.Local.iCounter).SERIAL!FieldValTrim, "Bin", V.DataView.dtJ52!dvValid(V.Local.iCounter).FINAL_BIN!FieldValTrim, "WO", V.DataView.dtJ52!dvValid(V.Local.iCounter).JOB!FieldValTrim, "WO_SUFFIX", V.DataView.dtJ52!dvValid(V.Local.iCounter).SUFFIX!FieldValTrim, "DESCR", V.DataView.dtJ52!dvValid(V.Local.iCounter).DESCRIPTION!FieldValTrim, "INV_UM", V.DataView.dtJ52!dvValid(V.Local.iCounter).UM!FieldValTrim, "WO_DUE_DATE", V.DataView.dtJ52!dvValid(V.Local.iCounter).DATE_DUE!FieldVal, "PRINTER", V.DataView.dtJ52!dvValid(V.Local.iCounter).PRINTER!FieldValTrim,"LABEL_COPY", V.DataView.dtJ52!dvValid(V.Local.iCounter).LABELCOPIES!FieldValTrim, "USERFIELD1", V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD1!FieldValTrim, "USERFIELD2", V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD2!FieldValTrim, "USERFIELD3", V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD3!FieldValTrim, "USERFIELD4", V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD4!FieldValTrim, "USERFIELD5", V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD5!FieldValTrim, "USERFIELD6", V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD6!FieldValTrim, "USERFIELD7", V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD7!FieldValTrim, "USERFIELD8", V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD8!FieldValTrim, "USERFIELD9", V.DataView.dtJ52!dvValid(V.Local.iCounter).USERFIELD9!FieldValTrim, "PROD_LINE", V.DataView.dtJ52!dvValid(V.Local.iCounter).PRODUCT_LINE!FieldValTrim, "DESCRIPTION_2", V.DataView.dtJ52!dvValid(V.Local.iCounter).DESCRIPTION_2!FieldValTrim, "DESCRIPTION_3", V.DataView.dtJ52!dvValid(V.Local.iCounter).DESCRIPTION_3!FieldValTrim, "EXTRA_TEXT", V.DataView.dtJ52!dvValid(V.Local.iCounter).EXTRA_TEXT!FieldValTrim, "PO_FROM_WO", V.DataView.dtJ52!dvValid(V.Local.iCounter).CUSTOMER_PO!FieldValTrim, "CUST_PART", V.DataView.dtJ52!dvValid(V.Local.iCounter).PART_CUSTOMER!FieldValTrim, "CUSTOMER", V.DataView.dtJ52!dvValid(V.Local.iCounter).CUSTOMER!FieldValTrim, "SO", V.DataView.dtJ52!dvValid(V.Local.iCounter).SALES_ORDER!FieldValTrim, "SO_LINE", V.DataView.dtJ52!dvValid(V.Local.iCounter).SALES_ORDER_LINE!FieldValTrim, "CUSTOMER_NAME", V.DataView.dtJ52!dvValid(V.Local.iCounter).CUSTOMER_NAME!FieldValTrim, "PART_SUB", V.DataView.dtJ52!dvValid(V.Local.iCounter).PART_SUB!FieldValTrim, "PART_DESCR_SUB", V.DataView.dtJ52!dvValid(V.Local.iCounter).PART_DESCR_SUB!FieldValTrim, "DEFAULT_BIN", V.DataView.dtJ52!dvValid(V.Local.iCounter).DEFAULT_BIN!FieldValTrim)
+			f.Data.Datatable.AddDisplayPartColumn("dtLabel",0,"PART","LP_DISPLAY_PART")
+	F.Intrinsic.Control.EndIf
+	
+	'print label
+	F.Intrinsic.Control.CallSub(PrintJ52Label)
+	F.Intrinsic.Control.CallSub(Updatehistory_user)
+	F.Data.DataTable.DeleteRow("2003")
+	F.Data.DataTable.DeleteRow("2003File")
+	F.Data.DataTable.DeleteRow("dtLabel")
+	F.Data.DataTable.AcceptChanges("2003")
+	F.Data.DataTable.AcceptChanges("2003File")
+	F.Data.DataTable.AcceptChanges("dtLabel")
+F.Intrinsic.Control.Next(V.Local.iCounter)
+
+F.Data.DataTable.Close("dtLabel")
+F.Data.DataTable.Close("dtJ52")
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",v.Caller.ScriptFile,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+F.Intrinsic.Control.EndTry
+Program.Sub.ProcessMobileJ52Transactions.End
+
+Program.Sub.PrintJ52Label.Start
+F.Intrinsic.Control.Try
+V.Local.sError.Declare
+
+V.Local.iBIRun.Declare(Long)
+V.Local.iBILog.Declare(Long)
+V.Local.iReportID.Declare(Long)
+V.Local.iRet.Declare(Long)
+V.Local.sSQL.Declare(String)
+V.Local.sPath.Declare(String)
+V.Local.sPrinter.Declare(String)
+V.Local.sRet.Declare(String)
+V.Local.bExists.Declare(Boolean)
+
+F.Intrinsic.Control.If(V.DataTable.dtLabel.RowCount, <, 1)
+	F.Intrinsic.Control.ExitSub
+F.Intrinsic.Control.EndIf
+
+'this is bad as what if different printer on same transaction
+V.Local.sPrinter.Set(V.DataTable.dtLabel(0).PRINTER!FieldValTrim)
+F.Intrinsic.Control.If(V.DataTable.dtLabel(0).PRINTER!FieldValTrim,=,"")
+	F.Intrinsic.Control.ExitSub
+F.Intrinsic.Control.EndIf
+
+'Set Default Bin
+'F.Intrinsic.String.Build("select bin from inventory_mstr where part='{0}' and location='{1}'",V.DataTable.dtLabel(0).PART!FieldVal,V.DataTable.dtLabel(0).LOCN!FieldVal,V.Local.sSQL)
+'F.ODBC.Connection!Con.ExecuteAndReturn(V.Local.sSQL,V.Local.sRet)
+'F.Data.DataTable.AddColumn("dtLabel","DEFAULT_BIN","String")
+'F.Data.DataTable.SetValue("dtLabel",-1,"DEFAULT_BIN",V.Local.sRet)
+
+F.Global.BI.GetRunID(V.Local.iBIRun)
+
+
+'added 02/27/24 - support customer specific labels
+F.Intrinsic.Control.If(V.DataTable.dtLabel(0).CUSTOMER!FieldValTrim,<>,"")
+	F.Intrinsic.String.Build("{0}\LABELS\CUSTOM\GAB_6588_WIP_FG_Label_{1}.lab", V.Caller.BusintDir, V.DataTable.dtLabel(0).CUSTOMER!FieldValTrim,V.Local.sPath)
+	f.Intrinsic.File.Exists(v.Local.sPath,v.Local.bExists)
+	f.Intrinsic.Control.If(v.Local.bExists,=,"False")
+		F.Intrinsic.String.Build("{0}\LABELS\CUSTOM\GAB_6588_WIP_FG_Label.lab", V.Caller.BusintDir, V.Local.sPath)
+	f.Intrinsic.Control.EndIf
+F.Intrinsic.Control.Else
+	F.Intrinsic.String.Build("{0}\LABELS\CUSTOM\GAB_6588_WIP_FG_Label.lab", V.Caller.BusintDir, V.Local.sPath)
+F.Intrinsic.Control.EndIf
+
+F.Global.BI.InitializeReport("GS Mobile Wip to FG Label", V.Local.sPath, V.Local.iReportID)
+
+F.Global.BI.StartLogging(V.Local.iBIRun, V.Local.iReportID, -1, "", V.Local.iBILog)
+'Function.Intrinsic.Debug.InvokeDebugger
+
+F.Data.DataTable.SetValue("dtLabel", -1, "RUNID", V.Local.iBIRun, "LOGID", V.Local.iBILog, "LBL_CREATE_DATE", V.Ambient.Date, "LBL_CREATE_TIME", V.Ambient.Time, "USER_ID", V.DataView.dtJ52!dvValid(0).MOBILE_USERID!FieldValTrim, "WO_SEQ", "999999")
+F.Data.DataTable.SetSeries("dtLabel", "SEQ", 0, 1)
+F.Data.DataTable.SetValueFormat("dtLabel", -1, "SEQ", "SEQ", "00000")
+F.Global.BI.StopLogging(V.Local.iBILog)
+
+F.Global.BI.PrintCodesoftLabelFromDataTable(V.Local.iBIRun, V.Local.iBILog, "dtLabel", V.Local.sPrinter, False)
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",v.Caller.ScriptFile,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+F.Intrinsic.Control.EndTry
+Program.Sub.PrintJ52Label.End
+
+Program.Sub.UploadJ52Transactions.Start
+'store the transactions in the wireless table to be processed by wirepoll
+'first store the line records
+'then the header records
+
+F.Intrinsic.Control.Try
+V.Local.sError.Declare
+
+F.Intrinsic.Control.CallSub(ProcessMobileJ52Transactions)
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",v.Caller.ScriptFile,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+F.Intrinsic.Control.EndTry
+Program.Sub.UploadJ52Transactions.End
+
+Program.Sub.Exit.Start
+F.Intrinsic.Control.Try
+V.Local.sError.Declare
+
+V.Local.sMessage.Declare(String)
+
+'F.Intrinsic.Control.CallSub(LogTransactions)
+
+'pass transaction info back to watchdog using PID passed in switch
+F.Intrinsic.String.Build("{0}::{1}::{2}::{3}::{4}::{5}::{6}::{7}", V.Global.iTransactions, V.Global.iSuccessfulTransactions, V.Global.iJ55Transactions, V.Global.iO90Transactions, V.Global.iJ52Transactions, V.Global.iL01Transactions, V.Global.iP10Transactions, V.Global.iS99Transactions, V.Local.sMessage)
+F.Intrinsic.IPM.SendMessage(V.Local.sMessage, V.Caller.Switches)
+
+F.Intrinsic.Control.CallSub(CloseDataTables)
+
+F.ODBC.Connection!Con.Close
+F.ODBC.Connection!Cony.Close
+F.Intrinsic.Control.End
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",v.Caller.ScriptFile,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+F.Intrinsic.Control.EndTry
+Program.Sub.Exit.End
+
+Program.Sub.CloseDataTables.Start
+F.Intrinsic.Control.Try
+V.Local.sError.Declare
+
+F.Intrinsic.Control.If(V.DataTable.dtTransactionSettings.Exists)
+	F.Data.DataTable.Close("dtTransactionSettings")
+F.Intrinsic.Control.EndIf
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",v.Caller.ScriptFile,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+F.Intrinsic.Control.EndTry
+Program.Sub.CloseDataTables.End
+
+Program.Sub.Updatehistory_user.Start
+F.Intrinsic.Control.Try
+V.Local.sError.Declare
+v.Local.sSQL.Declare(String)
+
+'update gs mobile userid 
+'INVENTORY_HISTORY
+F.Intrinsic.String.Build("UPDATE INVENTORY_HIST SET USERID = '{0}' WHERE JOB = '{1}' AND SUFFIX = '{2}' AND SEQ = '999999' AND USERID = 'WIRE' AND CODE_TRANSACTION = 'J52'",V.DataView.dtJ52!dvValid(0).MOBILE_USERID!FieldValTrim,V.DataView.dtJ52!dvValid(0).JOB!FieldValTrim,V.DataView.dtJ52!dvValid(0).SUFFIX!FieldValTrim,V.Local.sSQL)
+F.ODBC.Connection!con.Execute(V.Local.sSQL)
+'ITEM_HISTORY
+F.Intrinsic.String.Build("UPDATE ITEM_HISTORY SET USERID = '{0}' WHERE JOB = '{1}' AND SUFFIX = '{2}' AND SEQUENCE = '999999' AND USERID = 'WIRE' AND LOT = '{3}' AND BIN = '{4}' AND HEAT = '{5}' AND SERIAL_NUMBER = '{6}'",V.DataView.dtJ52!dvValid(0).MOBILE_USERID!FieldValTrim,V.DataView.dtJ52!dvValid(0).JOB!FieldValTrim,V.DataView.dtJ52!dvValid(0).SUFFIX!FieldValTrim,V.DataView.dtJ52!dvValid(0).LOT!FieldValTrim,V.DataView.dtJ52!dvValid(0).FINAL_BIN!FieldValTrim,V.DataView.dtJ52!dvValid(0).HEAT!FieldValTrim,V.DataView.dtJ52!dvValid(0).SERIAL!FieldValTrim,V.Local.sSQL)
+F.ODBC.Connection!con.Execute(V.Local.sSQL)
+'JOB_DETAIL
+F.Intrinsic.String.Build("UPDATE JOB_DETAIL SET LAST_CHG_BY = '{0}' WHERE JOB = '{1}' AND SUFFIX = '{2}' AND SEQ = '999999' AND LAST_CHG_BY = 'WIRE'",V.DataView.dtJ52!dvValid(0).MOBILE_USERID!FieldValTrim,V.DataView.dtJ52!dvValid(0).JOB!FieldValTrim,V.DataView.dtJ52!dvValid(0).SUFFIX!FieldValTrim,V.Local.sSQL)
+F.ODBC.Connection!con.Execute(V.Local.sSQL)
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",v.Caller.ScriptFile,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+F.Intrinsic.Control.EndTry
+Program.Sub.Updatehistory_user.End
+
+Program.Sub.Comments.Start
+${$5$}$2.0.0.0$}$2
+${$6$}$bstevens$}$20240311141714057$}$3Pg7+K2MGztoXyjxMVZqWaM5g3GOUsSNufBpXkESEJRLBtOKWtts2rmUreRZdRY/edzTfnMJqFmOqrW3cKGjJw==
+Program.Sub.Comments.End
